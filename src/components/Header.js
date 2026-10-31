@@ -1,5 +1,5 @@
 import { SettingsModal } from './SettingsModal.js';
-import { t, getLang, setLang } from '../lib/i18n.js';
+import { t, getLang, setLang, LANGUAGES } from '../lib/i18n.js';
 
 export function Header(navigate) {
     const header = document.createElement('header');
@@ -36,20 +36,19 @@ export function Header(navigate) {
         { label: t('nav.mcpcli'),  page: 'mcp-cli' },
     ];
 
+    const dot = document.createElement('div');
+    dot.className = 'absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full';
+
     items.forEach(({ label, page }, idx) => {
         const link = document.createElement('a');
         link.textContent = label;
         link.className = `hover:text-white transition-all cursor-pointer relative group ${idx === 0 ? 'text-white' : ''}`;
-
-        if (idx === 0) {
-            const dot = document.createElement('div');
-            dot.className = 'absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full';
-            link.appendChild(dot);
-        }
+        if (idx === 0) link.appendChild(dot);
 
         link.onclick = () => {
             Array.from(menu.children).forEach(child => child.classList.remove('text-white'));
             link.classList.add('text-white');
+            link.appendChild(dot);
             navigate(page);
         };
 
@@ -76,13 +75,15 @@ export function Header(navigate) {
         document.body.appendChild(SettingsModal());
     };
 
-    // Language toggle button
-    const langBtn = document.createElement('button');
-    const currentLang = getLang();
-    langBtn.className = 'flex items-center px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors';
-    langBtn.title = currentLang === 'zh-CN' ? t('web.switchToEn') : t('web.switchToZh');
-    langBtn.textContent = currentLang === 'zh-CN' ? 'EN' : '中文';
-    langBtn.onclick = () => setLang(currentLang === 'zh-CN' ? 'en' : 'zh-CN');
+    // Language picker
+    const langBtn = document.createElement('select');
+    langBtn.className = 'px-2 py-1.5 rounded-md border border-white/10 bg-white/5 font-mono text-[11px] uppercase tracking-[0.1em] text-white/80 hover:text-white hover:border-white/20 transition-colors cursor-pointer outline-none';
+    langBtn.title = t('web.language');
+    langBtn.setAttribute('aria-label', t('web.language'));
+    for (const [code, name] of Object.entries(LANGUAGES)) {
+        langBtn.add(new Option(name, code, false, code === getLang()));
+    }
+    langBtn.onchange = () => setLang(langBtn.value);
 
     rightPart.appendChild(langBtn);
     rightPart.appendChild(settingsBtn);

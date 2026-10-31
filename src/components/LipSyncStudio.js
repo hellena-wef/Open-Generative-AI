@@ -1,7 +1,8 @@
 import { muapi } from '../lib/muapi.js';
 import { lipsyncModels, imageLipSyncModels, videoLipSyncModels, getLipSyncModelById, getResolutionsForLipSyncModel } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
-import { t } from '../lib/i18n.js';
+import { t, tf } from '../lib/i18n.js';
+import { studioHeroHTML } from './studioHero.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 
@@ -28,30 +29,7 @@ export function LipSyncStudio() {
     // ==========================================
     const hero = document.createElement('div');
     hero.className = 'flex flex-col items-center mb-10 md:mb-20 animate-fade-in-up transition-all duration-700';
-    hero.innerHTML = `
-        <div class="mb-10 relative group">
-            <div class="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-40 group-hover:opacity-70 transition-opacity duration-1000"></div>
-            <div class="relative w-24 h-24 md:w-32 md:h-32 bg-mint rounded-3xl flex items-center justify-center border border-white/5 overflow-hidden">
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-primary opacity-20 absolute -right-4 -bottom-4">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                    <line x1="12" y1="19" x2="12" y2="23"/>
-                    <line x1="8" y1="23" x2="16" y2="23"/>
-                </svg>
-                <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-glow relative z-10">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary">
-                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                        <line x1="12" y1="19" x2="12" y2="23"/>
-                        <line x1="8" y1="23" x2="16" y2="23"/>
-                    </svg>
-                </div>
-                <div class="absolute top-4 right-4 text-primary animate-pulse">🎙</div>
-            </div>
-        </div>
-        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">${t('lipsync.title')}</h1>
-        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">${t('lipsync.subtitle')}</p>
-    `;
+    hero.innerHTML = studioHeroHTML(t('lipsync.title'), t('lipsync.subtitle'));
     container.appendChild(hero);
 
     // ==========================================
@@ -119,12 +97,12 @@ export function LipSyncStudio() {
 
     const videoPickerBtn = document.createElement('button');
     videoPickerBtn.type = 'button';
-    videoPickerBtn.title = 'Upload source video';
+    videoPickerBtn.title = t('lipsync.uploadSourceVideo');
     videoPickerBtn.className = 'flex-shrink-0 w-14 h-14 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden hidden bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group';
 
     const videoIconEl = document.createElement('div');
     videoIconEl.className = 'flex flex-col items-center justify-center gap-1 w-full h-full';
-    videoIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">VIDEO</span>`;
+    videoIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">${t('lipsync.badgeVideo')}</span>`;
 
     const videoSpinnerEl = document.createElement('div');
     videoSpinnerEl.className = 'hidden items-center justify-center w-full h-full';
@@ -132,7 +110,7 @@ export function LipSyncStudio() {
 
     const videoReadyEl = document.createElement('div');
     videoReadyEl.className = 'hidden flex-col items-center justify-center gap-1 w-full h-full absolute inset-0 bg-primary/10';
-    videoReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-primary font-bold">READY</span>`;
+    videoReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-primary font-bold">${t('lipsync.badgeReady')}</span>`;
 
     videoPickerBtn.appendChild(videoFileInput);
     videoPickerBtn.appendChild(videoIconEl);
@@ -144,7 +122,7 @@ export function LipSyncStudio() {
         videoSpinnerEl.classList.add('hidden'); videoSpinnerEl.classList.remove('flex');
         videoReadyEl.classList.add('hidden'); videoReadyEl.classList.remove('flex');
         videoPickerBtn.classList.remove('border-primary/60'); videoPickerBtn.classList.add('border-white/10');
-        videoPickerBtn.title = 'Upload source video';
+        videoPickerBtn.title = t('lipsync.uploadSourceVideo');
         mediaStatusLabel.textContent = t('lipsync.noVideo'); mediaStatusLabel.className = 'text-muted';
     };
     const showVideoSpinner = () => {
@@ -157,7 +135,7 @@ export function LipSyncStudio() {
         videoSpinnerEl.classList.add('hidden'); videoSpinnerEl.classList.remove('flex');
         videoReadyEl.classList.replace('hidden', 'flex');
         videoPickerBtn.classList.remove('border-white/10'); videoPickerBtn.classList.add('border-primary/60');
-        videoPickerBtn.title = `${name} — click to clear`;
+        videoPickerBtn.title = tf('common.clickToClear', name);
         mediaStatusLabel.textContent = `✓ ${name}`; mediaStatusLabel.className = 'text-primary';
     };
 
@@ -175,7 +153,7 @@ export function LipSyncStudio() {
         try {
             uploadedVideoUrl = await muapi.uploadFile(file);
             showVideoReady(file.name);
-        } catch (err) { showVideoIcon(); alert(`Video upload failed: ${err.message}`); }
+        } catch (err) { showVideoIcon(); alert(tf('common.videoUploadFailed', err.message)); }
         videoFileInput.value = '';
     };
 
@@ -187,12 +165,12 @@ export function LipSyncStudio() {
 
     const audioPickerBtn = document.createElement('button');
     audioPickerBtn.type = 'button';
-    audioPickerBtn.title = 'Upload audio file';
+    audioPickerBtn.title = t('lipsync.uploadAudio');
     audioPickerBtn.className = 'flex-shrink-0 w-14 h-14 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group';
 
     const audioIconEl = document.createElement('div');
     audioIconEl.className = 'flex flex-col items-center justify-center gap-1 w-full h-full';
-    audioIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">AUDIO</span>`;
+    audioIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">${t('lipsync.badgeAudio')}</span>`;
 
     const audioSpinnerEl = document.createElement('div');
     audioSpinnerEl.className = 'hidden items-center justify-center w-full h-full';
@@ -200,7 +178,7 @@ export function LipSyncStudio() {
 
     const audioReadyEl = document.createElement('div');
     audioReadyEl.className = 'hidden flex-col items-center justify-center gap-1 w-full h-full absolute inset-0 bg-primary/10';
-    audioReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-primary font-bold">READY</span>`;
+    audioReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-primary font-bold">${t('lipsync.badgeReady')}</span>`;
 
     audioPickerBtn.appendChild(audioFileInput);
     audioPickerBtn.appendChild(audioIconEl);
@@ -212,7 +190,7 @@ export function LipSyncStudio() {
         audioSpinnerEl.classList.add('hidden'); audioSpinnerEl.classList.remove('flex');
         audioReadyEl.classList.add('hidden'); audioReadyEl.classList.remove('flex');
         audioPickerBtn.classList.remove('border-primary/60'); audioPickerBtn.classList.add('border-white/10');
-        audioPickerBtn.title = 'Upload audio file';
+        audioPickerBtn.title = t('lipsync.uploadAudio');
         audioStatusLabel.textContent = t('lipsync.noAudio'); audioStatusLabel.className = 'text-muted';
     };
     const showAudioSpinner = () => {
@@ -225,7 +203,7 @@ export function LipSyncStudio() {
         audioSpinnerEl.classList.add('hidden'); audioSpinnerEl.classList.remove('flex');
         audioReadyEl.classList.replace('hidden', 'flex');
         audioPickerBtn.classList.remove('border-white/10'); audioPickerBtn.classList.add('border-primary/60');
-        audioPickerBtn.title = `${name} — click to clear`;
+        audioPickerBtn.title = tf('common.clickToClear', name);
         audioStatusLabel.textContent = `✓ ${name}`; audioStatusLabel.className = 'text-primary';
     };
 
@@ -243,7 +221,7 @@ export function LipSyncStudio() {
         try {
             uploadedAudioUrl = await muapi.uploadFile(file);
             showAudioReady(file.name);
-        } catch (err) { showAudioIcon(); alert(`Audio upload failed: ${err.message}`); }
+        } catch (err) { showAudioIcon(); alert(tf('lipsync.audioUploadFailed', err.message)); }
         audioFileInput.value = '';
     };
 
@@ -301,7 +279,7 @@ export function LipSyncStudio() {
     const generateBtn = document.createElement('button');
     generateBtn.id = 'ls-generate-btn';
     generateBtn.type = 'button';
-    generateBtn.className = 'ml-auto px-6 py-2.5 bg-primary text-black font-black text-sm rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-glow disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100';
+    generateBtn.className = 'whitespace-nowrap shrink-0 ml-auto px-6 py-2.5 bg-primary text-black font-black text-sm rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-glow disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100';
     generateBtn.textContent = t('common.generate');
 
     bottomRow.appendChild(modelBtn);
@@ -465,7 +443,7 @@ export function LipSyncStudio() {
     const generationHistory = [];
 
     const historySidebar = document.createElement('div');
-    historySidebar.className = 'fixed right-0 top-0 h-full w-20 md:w-24 bg-black/60 backdrop-blur-xl border-l border-white/5 z-50 flex flex-col items-center py-4 gap-3 overflow-y-auto transition-all duration-500 translate-x-full opacity-0';
+    historySidebar.className = 'fixed right-0 top-16 bottom-0 w-20 md:w-24 bg-black/60 backdrop-blur-xl border-l border-white/5 z-50 flex flex-col items-center py-4 gap-3 overflow-y-auto transition-all duration-500 translate-x-full opacity-0';
     historySidebar.id = 'lipsync-history-sidebar';
 
     const historyLabel = document.createElement('div');
@@ -544,7 +522,7 @@ export function LipSyncStudio() {
             thumb.innerHTML = `
                 <video src="${entry.url}" preload="metadata" muted class="w-full aspect-square object-cover"></video>
                 <div class="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
-                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="Download">
+                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="${t('common.downloadTitle')}">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     </button>
                 </div>
@@ -592,7 +570,7 @@ export function LipSyncStudio() {
         if (!apiKey) return;
         const banner = document.createElement('div');
         banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-card-bg border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
-        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">Resuming ${pending.length} pending generation${pending.length > 1 ? 's' : ''}…</span>`;
+        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">${tf('common.resumingPending', pending.length)}</span>`;
         document.body.appendChild(banner);
         let remaining = pending.length;
         pending.forEach(async (job) => {
@@ -607,7 +585,7 @@ export function LipSyncStudio() {
                 removePendingJob(job.requestId);
                 remaining--;
                 if (remaining === 0) banner.remove();
-                else banner.querySelector('.banner-text').textContent = `Resuming ${remaining} pending generation${remaining > 1 ? 's' : ''}…`;
+                else banner.querySelector('.banner-text').textContent = tf('common.resumingPending', remaining);
             }
         });
     })();
@@ -713,14 +691,14 @@ export function LipSyncStudio() {
                 addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, timestamp: new Date().toISOString() });
                 showVideoInCanvas(res.url);
             } else {
-                throw new Error('No video URL returned by API');
+                throw new Error(t('common.noVideoUrl'));
             }
         } catch (e) {
             hadError = true;
             if (capturedRequestId) removePendingJob(capturedRequestId);
             console.error(e);
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
+            generateBtn.innerHTML = tf('common.error', e.message.slice(0, 60));
             setTimeout(() => { generateBtn.innerHTML = t('common.generate'); }, 4000);
         } finally {
             generateBtn.disabled = false;

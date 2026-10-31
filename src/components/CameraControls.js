@@ -1,5 +1,6 @@
 
 import { CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT } from '../lib/promptUtils.js';
+import { t } from '../lib/i18n.js';
 
 const ASSET_URLS = {
     // CAMERA
@@ -242,10 +243,10 @@ export function CameraControls(onChange) {
         return colWrapper;
     };
 
-    container.appendChild(createColumn('Camera', Object.keys(CAMERA_MAP), 'camera', state.camera));
-    container.appendChild(createColumn('Lens', Object.keys(LENS_MAP), 'lens', state.lens));
-    container.appendChild(createColumn('Focal Length', Object.keys(FOCAL_PERSPECTIVE).map(k => parseInt(k)), 'focal', state.focal));
-    container.appendChild(createColumn('Aperture', Object.keys(APERTURE_EFFECT), 'aperture', state.aperture));
+    container.appendChild(createColumn(t('cinema.camera'), Object.keys(CAMERA_MAP), 'camera', state.camera));
+    container.appendChild(createColumn(t('cinema.lens'), Object.keys(LENS_MAP), 'lens', state.lens));
+    container.appendChild(createColumn(t('cinema.focalLength'), Object.keys(FOCAL_PERSPECTIVE).map(k => parseInt(k)), 'focal', state.focal));
+    container.appendChild(createColumn(t('cinema.aperture'), Object.keys(APERTURE_EFFECT), 'aperture', state.aperture));
 
     return container;
 }

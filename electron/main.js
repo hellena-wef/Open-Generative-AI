@@ -38,7 +38,8 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js'),
         },
         ...(isMac ? { titleBarStyle: 'hiddenInset' } : {}),
-        backgroundColor: '#0d0d0d',
+        backgroundColor: '#FCFCFA',
+        icon: path.join(__dirname, '../build/icon.png'),
         show: false,
         title: 'Faísca',
     });

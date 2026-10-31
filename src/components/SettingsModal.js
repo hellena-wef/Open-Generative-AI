@@ -4,17 +4,17 @@ import { t } from '../lib/i18n.js';
 
 export function SettingsModal(onClose) {
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:100;';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(17,17,17,0.35);display:flex;align-items:center;justify-content:center;z-index:100;';
 
     const modal = document.createElement('div');
-    modal.style.cssText = 'background:var(--bg-card,#111);border-radius:1rem;border:1px solid rgba(255,255,255,0.08);width:min(90vw,36rem);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;';
+    modal.style.cssText = 'background:var(--bg-card,#FCFCFA);border-radius:1rem;border:1px solid rgba(17,17,17,0.08);width:min(90vw,36rem);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;';
 
     // ── Header ────────────────────────────────────────────────────────────────
     const header = document.createElement('div');
-    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;';
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid rgba(17,17,17,0.06);flex-shrink:0;';
     header.innerHTML = `
-        <h2 style="font-size:1rem;font-weight:800;color:#fff;margin:0;">${t('settings.title')}</h2>
-        <button id="settings-close-btn" style="color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer;padding:4px;">
+        <h2 style="font-size:1rem;font-weight:800;color:#111111;margin:0;">${t('settings.title')}</h2>
+        <button id="settings-close-btn" style="color:rgba(17,17,17,0.4);background:none;border:none;cursor:pointer;padding:4px;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
     `;
@@ -29,7 +29,7 @@ export function SettingsModal(onClose) {
     let activeTab = 'api';
 
     const tabBar = document.createElement('div');
-    tabBar.style.cssText = 'display:flex;gap:0.25rem;padding:0.75rem 1.5rem 0;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;';
+    tabBar.style.cssText = 'display:flex;gap:0.25rem;padding:0.75rem 1.5rem 0;border-bottom:1px solid rgba(17,17,17,0.06);flex-shrink:0;';
 
     const tabBtns = {};
     TABS.forEach(({ id, label }) => {
@@ -52,18 +52,18 @@ export function SettingsModal(onClose) {
     apiPanel.innerHTML = `
         <div style="display:flex;flex-direction:column;gap:0.75rem;">
             <div>
-                <label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:0.4rem;font-weight:600;">${t('settings.muapiKeyLabel')}</label>
+                <label style="display:block;font-size:0.75rem;color:rgba(17,17,17,0.5);margin-bottom:0.4rem;font-weight:600;">${t('settings.muapiKeyLabel')}</label>
                 <input id="settings-api-key" type="password"
-                    style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:0.75rem;padding:0.6rem 0.9rem;color:#fff;font-size:0.875rem;outline:none;"
+                    style="width:100%;box-sizing:border-box;background:rgba(17,17,17,0.05);border:1px solid rgba(17,17,17,0.1);border-radius:0.75rem;padding:0.6rem 0.9rem;color:#111111;font-size:0.875rem;outline:none;"
                     placeholder="${t('settings.keyPlaceholder')}"
                     value="${localStorage.getItem('muapi_key') || ''}">
             </div>
-            <p style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin:0;">
+            <p style="font-size:0.7rem;color:rgba(17,17,17,0.3);margin:0;">
                 ${t('settings.keyNote')}
             </p>
             <div style="display:flex;justify-content:flex-end;gap:0.5rem;margin-top:0.5rem;">
-                <button id="settings-cancel-btn" style="padding:0.5rem 1rem;border-radius:0.5rem;background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-size:0.75rem;font-weight:700;cursor:pointer;">${t('common.cancel')}</button>
-                <button id="settings-save-btn" style="padding:0.5rem 1rem;border-radius:0.5rem;background:var(--color-primary,#22d3ee);color:#000;font-size:0.75rem;font-weight:700;cursor:pointer;border:none;">${t('common.save')}</button>
+                <button id="settings-cancel-btn" style="padding:0.5rem 1rem;border-radius:0.5rem;background:none;border:1px solid rgba(17,17,17,0.1);color:rgba(17,17,17,0.6);font-size:0.75rem;font-weight:700;cursor:pointer;">${t('common.cancel')}</button>
+                <button id="settings-save-btn" style="padding:0.5rem 1rem;border-radius:0.5rem;background:var(--color-primary,#E5251E);color:#FCFCFA;font-size:0.75rem;font-weight:700;cursor:pointer;border:none;">${t('common.save')}</button>
             </div>
         </div>
     `;
@@ -79,11 +79,11 @@ export function SettingsModal(onClose) {
         TABS.forEach(({ id: tid }) => {
             const btn = tabBtns[tid];
             if (tid === id) {
-                btn.style.background = 'rgba(255,255,255,0.08)';
-                btn.style.color = '#fff';
+                btn.style.background = 'rgba(17,17,17,0.08)';
+                btn.style.color = '#111111';
             } else {
                 btn.style.background = 'transparent';
-                btn.style.color = 'rgba(255,255,255,0.4)';
+                btn.style.color = 'rgba(17,17,17,0.4)';
             }
         });
 

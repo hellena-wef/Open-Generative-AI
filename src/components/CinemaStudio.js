@@ -28,8 +28,8 @@ export function CinemaStudio() {
     const heroSection = document.createElement('div');
     heroSection.className = 'flex flex-col items-center justify-center text-center px-4 animate-fade-in-up';
     heroSection.innerHTML = `
-        <div class="mb-4 text-xs font-bold text-white/40 tracking-[0.2em] uppercase">${t('cinema.tagline')}</div>
-        <h1 class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50 tracking-tight leading-tight mb-2">
+        <div class="mb-6 font-mono text-[11px] text-secondary tracking-[0.15em] uppercase">${t('cinema.tagline')}</div>
+        <h1 class="text-4xl md:text-6xl font-light text-white tracking-tight leading-tight mb-2">
             ${t('cinema.headline')}
         </h1>
     `;
@@ -51,7 +51,7 @@ export function CinemaStudio() {
     overlayHeader.className = 'flex items-center justify-between mb-8';
     overlayHeader.innerHTML = `
         <div class="flex gap-4">
-            <button class="px-4 py-2 bg-white text-black text-xs font-bold rounded-full">All</button>
+            <button class="px-4 py-2 bg-white text-black text-xs font-bold rounded-full">${t('cinema.all')}</button>
         </div>
         <button id="close-overlay-btn" class="text-white/50 hover:text-white transition-colors">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -235,8 +235,8 @@ export function CinemaStudio() {
 
     // Generate Button
     const generateBtn = document.createElement('button');
-    generateBtn.className = 'h-[56px] px-8 bg-primary text-black rounded-xl font-black text-xs uppercase hover:bg-white transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed';
-    generateBtn.setAttribute('data-tooltip', 'Generate cinema shot');
+    generateBtn.className = 'whitespace-nowrap shrink-0 h-[56px] px-8 bg-primary text-black rounded-xl font-black text-xs uppercase hover:bg-white transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed';
+    generateBtn.setAttribute('data-tooltip', t('cinema.generateTooltip'));
     generateBtn.innerHTML = t('cinema.generateBtn');
 
     rightGroup.appendChild(summaryCard);
@@ -362,7 +362,7 @@ export function CinemaStudio() {
 
     // History Sidebar - VISIBLE BY DEFAULT (removed translate-x-full opacity-0)
     const historySidebar = document.createElement('div');
-    historySidebar.className = 'fixed right-0 top-0 h-full w-20 md:w-24 bg-black/60 backdrop-blur-xl border-l border-white/5 z-50 flex flex-col items-center py-4 gap-3 overflow-y-auto transition-all duration-500';
+    historySidebar.className = 'fixed right-0 top-16 bottom-0 w-20 md:w-24 bg-black/60 backdrop-blur-xl border-l border-white/5 z-50 flex flex-col items-center py-4 gap-3 overflow-y-auto transition-all duration-500';
 
     const historyLabel = document.createElement('div');
     historyLabel.className = 'text-[9px] font-bold text-white/40 uppercase tracking-widest mb-2';
@@ -579,7 +579,7 @@ export function CinemaStudio() {
 
                 showCanvas(res.url);
             } else {
-                throw new Error('No Data');
+                throw new Error(t('cinema.noData'));
             }
 
         } catch (e) {

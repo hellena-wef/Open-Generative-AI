@@ -86,7 +86,7 @@ function BinaryStatusBar(onStatusChange) {
         } catch (err) {
             unsub();
             const text = bar.querySelector('#binary-status-text');
-            if (text) text.textContent = `Error: ${err.message}`;
+            if (text) text.textContent = tf('common.error', err.message);
             btn.disabled = false;
             btn.textContent = t('common.retry');
         }
@@ -147,7 +147,7 @@ function AuxRow(label, auxKey, initStatus, onStateChange) {
                 if (onStateChange) onStateChange();
             } catch (err) {
                 unsub();
-                progText.textContent = `Error: ${err.message}`;
+                progText.textContent = tf('common.error', err.message);
                 btn.disabled = false;
                 btn.innerHTML = `${DownloadIcon} ${t('common.retry')}`;
             }
@@ -353,7 +353,7 @@ function ModelCard(model, onStateChange) {
                 if (onStateChange) onStateChange();
             } catch (err) {
                 unsub();
-                progressText.textContent = `Error: ${err.message}`;
+                progressText.textContent = tf('common.error', err.message);
                 downloadBtn.disabled = false;
                 downloadBtn.innerHTML = `${DownloadIcon} ${t('common.retry')}`;
             }
@@ -421,7 +421,7 @@ export function LocalModelManager() {
             const storagePath = status.modelsDir || status.dataDir;
             storageEl.textContent = storagePath ? `${t('localModels.storedIn')} ${storagePath}` : t('localModels.storedDefault');
             if (storagePath && status.envVar) {
-                storageEl.title = `Set ${status.envVar} before launch to change this location`;
+                storageEl.title = tf('localModels.storageEnvHint', status.envVar);
             }
         } catch (_) {
             storageEl.textContent = t('localModels.storedDefault');

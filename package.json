@@ -46,7 +46,8 @@
     "afterPack": "./afterPack.js",
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "build/icon.png"
     ],
     "extraResources": [
       {
@@ -59,7 +60,7 @@
     ],
     "mac": {
       "category": "public.app-category.graphics-design",
-      "icon": "public/banner.png",
+      "icon": "build/icon.png",
       "gatekeeperAssess": false,
       "target": [
         {
@@ -72,7 +73,7 @@
       ]
     },
     "win": {
-      "icon": "public/banner.png",
+      "icon": "build/icon.png",
       "signAndEditExecutable": false,
       "target": [
         {
@@ -89,7 +90,7 @@
       "include": "build/installer.nsh"
     },
     "linux": {
-      "icon": "public/banner.png",
+      "icon": "build/icon.png",
       "category": "Utility",
       "maintainer": "Open Generative AI Team",
       "extraFiles": [

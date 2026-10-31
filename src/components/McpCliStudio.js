@@ -1,4 +1,4 @@
-import { t } from '../lib/i18n.js';
+import { t, tf } from '../lib/i18n.js';
 
 export function McpCliStudio() {
     const container = document.createElement('div');
@@ -31,9 +31,9 @@ export function McpCliStudio() {
             <div class="flex-1 h-px bg-white/5"></div>
         </div>
         <div class="grid md:grid-cols-3 gap-4">
-            ${quickStep('1', 'Install the CLI', 'npm install -g muapi-cli')}
-            ${quickStep('2', 'Sign in', 'muapi auth login')}
-            ${quickStep('3', 'Generate from chat', 'npx skills add SamurAIGPT/muapi-skills')}
+            ${quickStep('1', t('mcp.stepInstall'), 'npm install -g muapi-cli')}
+            ${quickStep('2', t('mcp.stepSignIn'), 'muapi auth login')}
+            ${quickStep('3', t('mcp.stepGenerate'), 'npx skills add SamurAIGPT/muapi-skills')}
         </div>
     `;
     inner.appendChild(quick);
@@ -45,30 +45,30 @@ export function McpCliStudio() {
     cards.appendChild(featureCard({
         tag: 'CLI',
         title: 'muapi-cli',
-        body: 'Generate images, videos, and audio from the terminal across 14+ AI models. Dual interface — colored human output plus JSON for agents (--output-json, --jq filtering). Async workflows, file uploads, credit tracking.',
+        body: t('mcp.cliBody'),
         code: 'npm install -g muapi-cli\nmuapi image generate "a cyberpunk city" \\\n  --model flux-dev',
         link: 'https://github.com/SamurAIGPT/muapi-cli',
-        linkLabel: 'View muapi-cli on GitHub',
+        linkLabel: tf('mcp.viewNamedOnGithub', 'muapi-cli'),
         icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
     }));
 
     cards.appendChild(featureCard({
         tag: 'MCP',
         title: 'muapi-mcp-server',
-        body: 'Connect Claude, Cursor, Windsurf, and any MCP-compatible assistant to 100+ generative models. Hosted endpoint — no install. 19 structured tools with input/output schemas, async polling, and account management.',
+        body: t('mcp.serverBody'),
         code: 'claude mcp add --transport http muapi \\\n  https://api.muapi.ai/mcp \\\n  --header "Authorization: Bearer YOUR_KEY"',
         link: 'https://github.com/SamurAIGPT/muapi-mcp-server',
-        linkLabel: 'View muapi-mcp-server on GitHub',
+        linkLabel: tf('mcp.viewNamedOnGithub', 'muapi-mcp-server'),
         icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/></svg>`,
     }));
 
     cards.appendChild(featureCard({
-        tag: 'Skills',
+        tag: t('mcp.tagSkills'),
         title: 'Generative Media Skills',
-        body: 'Multimodal toolkit for Claude Code, Cursor, and Gemini CLI. Cinema Director, Nano-Banana, UI Designer, Logo Creator, Seedance 2, AI Clipping, and YouTube Shorts presets. Agent-native with JSON outputs and semantic exit codes.',
+        body: t('mcp.skillsBody'),
         code: 'npx skills add SamurAIGPT/muapi-skills --all',
         link: 'https://github.com/SamurAIGPT/muapi-skills',
-        linkLabel: 'View muapi-skills on GitHub',
+        linkLabel: tf('mcp.viewNamedOnGithub', 'muapi-skills'),
         icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.39 4.84L20 8l-4 3.9.94 5.5L12 14.77 7.06 17.4 8 11.9 4 8l5.61-1.16L12 2z"/></svg>`,
     }));
 
@@ -79,14 +79,14 @@ export function McpCliStudio() {
     examples.className = 'flex flex-col gap-4';
     examples.innerHTML = `
         <div class="flex items-center gap-2">
-            <span class="text-[11px] font-bold uppercase tracking-widest text-secondary">Examples</span>
+            <span class="text-[11px] font-bold uppercase tracking-widest text-secondary">${t('mcp.examples')}</span>
             <div class="flex-1 h-px bg-white/5"></div>
         </div>
         <div class="grid md:grid-cols-2 gap-4">
-            ${exampleBlock('Image generation', 'muapi image generate "a serene mountain lake at sunrise" \\\n  --model flux-dev --download ./outputs')}
-            ${exampleBlock('Text-to-video', 'muapi video generate "a dog running on a beach" \\\n  --model kling-master')}
-            ${exampleBlock('Audio creation', 'muapi audio create "upbeat lo-fi hip hop for studying"')}
-            ${exampleBlock('Run a skill', 'bash library/visual/nano-banana/scripts/\\\n  generate-nano-art.sh --file image.jpg --view')}
+            ${exampleBlock(t('mcp.exImage'), 'muapi image generate "a serene mountain lake at sunrise" \\\n  --model flux-dev --download ./outputs')}
+            ${exampleBlock(t('mcp.exVideo'), 'muapi video generate "a dog running on a beach" \\\n  --model kling-master')}
+            ${exampleBlock(t('mcp.exAudio'), 'muapi audio create "upbeat lo-fi hip hop for studying"')}
+            ${exampleBlock(t('mcp.exSkill'), 'bash library/visual/nano-banana/scripts/\\\n  generate-nano-art.sh --file image.jpg --view')}
         </div>
     `;
     inner.appendChild(examples);
@@ -96,31 +96,31 @@ export function McpCliStudio() {
     playground.className = 'glass-panel rounded-2xl p-6 md:p-8 flex flex-col gap-6';
     playground.innerHTML = `
         <div class="flex items-center gap-2">
-            <span class="text-[11px] font-bold uppercase tracking-widest text-secondary">Interactive Builder</span>
+            <span class="text-[11px] font-bold uppercase tracking-widest text-secondary">${t('mcp.builder')}</span>
             <div class="flex-1 h-px bg-white/5"></div>
         </div>
         <div class="flex flex-col md:flex-row gap-4 items-end">
             <div class="flex flex-col gap-1.5 flex-1 w-full">
-                <label class="text-[11px] font-bold tracking-wider uppercase text-secondary">Select Target Model</label>
+                <label class="text-[11px] font-bold tracking-wider uppercase text-secondary">${t('mcp.targetModel')}</label>
                 <select id="modelSelector" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white/30">
-                    <option value="image generate 'a retro-futuristic synthwave car' --model flux-dev">FLUX.1 Dev (Image)</option>
-                    <option value="image generate 'oil painting of an astronaut' --model midjourney">Midjourney (Image)</option>
-                    <option value="video generate 'cinematic drone shot of an ancient castle' --model kling-master">Kling Master (Video)</option>
-                    <option value="video generate 'cyberpunk neon alleyway rain' --model luma-ray">Luma Ray (Video)</option>
-                    <option value="audio create 'ambient electronic space synth for gaming'">Lyria 3 (Audio)</option>
+                    <option value="image generate 'a retro-futuristic synthwave car' --model flux-dev">FLUX.1 Dev (${t('mcp.kindImage')})</option>
+                    <option value="image generate 'oil painting of an astronaut' --model midjourney">Midjourney (${t('mcp.kindImage')})</option>
+                    <option value="video generate 'cinematic drone shot of an ancient castle' --model kling-master">Kling Master (${t('mcp.kindVideo')})</option>
+                    <option value="video generate 'cyberpunk neon alleyway rain' --model luma-ray">Luma Ray (${t('mcp.kindVideo')})</option>
+                    <option value="audio create 'ambient electronic space synth for gaming'">Lyria 3 (${t('mcp.kindAudio')})</option>
                 </select>
             </div>
             <div class="flex flex-col gap-1.5 flex-1 w-full">
-                <label class="text-[11px] font-bold tracking-wider uppercase text-secondary">Output Format</label>
+                <label class="text-[11px] font-bold tracking-wider uppercase text-secondary">${t('mcp.outputFormat')}</label>
                 <select id="flagSelector" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white/30">
-                    <option value="">Default (Human-Readable)</option>
-                    <option value=" --output-json">JSON Object (AI Agent Native)</option>
-                    <option value=" --output-json | jq '.data.url'">Filtered URL Stream (JQ)</option>
+                    <option value="">${t('mcp.fmtDefault')}</option>
+                    <option value=" --output-json">${t('mcp.fmtJson')}</option>
+                    <option value=" --output-json | jq '.data.url'">${t('mcp.fmtJq')}</option>
                 </select>
             </div>
         </div>
         <div class="flex flex-col gap-2">
-            <span class="text-[12px] font-bold text-white/80">Generated Terminal Command</span>
+            <span class="text-[12px] font-bold text-white/80">${t('mcp.generatedCommand')}</span>
             <pre id="interactiveTerminal" class="text-[12px] font-mono text-primary bg-black/60 border border-white/5 rounded-lg px-4 py-3 overflow-x-auto whitespace-pre"></pre>
         </div>
     `;
@@ -142,7 +142,7 @@ export function McpCliStudio() {
     // Footer note
     const footer = document.createElement('p');
     footer.className = 'text-center text-xs text-secondary opacity-60 pb-4';
-    footer.textContent = 'Open-source · MIT licensed · Works with Claude, Cursor, Windsurf, and Gemini CLI';
+    footer.textContent = t('mcp.footer');
     inner.appendChild(footer);
 
     return container;
@@ -176,7 +176,7 @@ function featureCard({ tag, title, body, code, link, linkLabel, icon }) {
         <p class="text-[13px] text-secondary leading-relaxed">${body}</p>
         <pre class="text-[11px] font-mono text-primary bg-black/40 rounded-md px-3 py-2 overflow-x-auto whitespace-pre">${escapeHtml(code)}</pre>
         <div class="flex items-center gap-1 text-[12px] font-bold text-secondary group-hover:text-white transition-colors mt-auto">
-            <span>View on GitHub</span>
+            <span>${t('mcp.viewOnGithub')}</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
         </div>
     `;
