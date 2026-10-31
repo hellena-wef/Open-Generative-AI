@@ -32,10 +32,23 @@ export function ImageStudio() {
     container.className = 'w-full h-full flex flex-col items-center justify-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
 
     // --- State ---
-    const defaultModel = t2iModels[0];
+    // The last generation's model, aspect ratio and quality come back on the next one
+    // (and survive restarts), so a 4:5 carousel session stays 4:5.
+    const LAST_KEY = 'faisca_image_last';
+    let last = {};
+    try { last = JSON.parse(localStorage.getItem(LAST_KEY) || '{}') || {}; } catch { /* ignore */ }
+    const rememberLast = (patch) => {
+        last = { ...last, ...patch };
+        try { localStorage.setItem(LAST_KEY, JSON.stringify(last)); } catch { /* storage full */ }
+    };
+    const pickAr = (list) => (list.includes(last.ar) ? last.ar : list[0]);
+    const pickQuality = (list) => (list.includes(last.quality) ? last.quality : list[0]);
+    const lastT2iModel = () => t2iModels.find(m => m.id === last.model) || t2iModels[0];
+
+    const defaultModel = lastT2iModel();
     let selectedModel = defaultModel.id;
     let selectedModelName = defaultModel.name;
-    let selectedAr = defaultModel.inputs?.aspect_ratio?.default || '1:1';
+    let selectedAr = pickAr(getAspectRatiosForModel(selectedModel)) || defaultModel.inputs?.aspect_ratio?.default || '1:1';
     let dropdownOpen = null;
     let uploadedImageUrls = []; // array of uploaded image URLs (multi-image support)
     let imageMode = false; // false = t2i models, true = i2i models
@@ -118,12 +131,12 @@ export function ImageStudio() {
                 imageMode = true;
                 selectedModel = i2iModels[0].id;
                 selectedModelName = i2iModels[0].name;
-                selectedAr = getAspectRatiosForI2IModel(selectedModel)[0];
+                selectedAr = pickAr(getAspectRatiosForI2IModel(selectedModel));
                 document.getElementById('model-btn-label').textContent = selectedModelName;
                 document.getElementById('ar-btn-label').textContent = selectedAr;
                 const validResolutions = getResolutionsForI2IModel(selectedModel);
                 qualityBtn.style.display = validResolutions.length > 0 ? 'flex' : 'none';
-                if (validResolutions.length > 0) document.getElementById('quality-btn-label').textContent = validResolutions[0];
+                if (validResolutions.length > 0) document.getElementById('quality-btn-label').textContent = pickQuality(validResolutions);
                 picker.setMaxImages(getMaxImagesForI2IModel(selectedModel));
             }
             textarea.placeholder = uploadedImageUrls.length > 1
@@ -133,14 +146,14 @@ export function ImageStudio() {
         onClear: () => {
             uploadedImageUrls = [];
             imageMode = false;
-            selectedModel = t2iModels[0].id;
-            selectedModelName = t2iModels[0].name;
-            selectedAr = getAspectRatiosForModel(selectedModel)[0];
+            selectedModel = lastT2iModel().id;
+            selectedModelName = lastT2iModel().name;
+            selectedAr = pickAr(getAspectRatiosForModel(selectedModel));
             document.getElementById('model-btn-label').textContent = selectedModelName;
             document.getElementById('ar-btn-label').textContent = selectedAr;
             const t2iResolutions = getResolutionsForModel(selectedModel);
             qualityBtn.style.display = t2iResolutions.length > 0 ? 'flex' : 'none';
-            if (t2iResolutions.length > 0) document.getElementById('quality-btn-label').textContent = t2iResolutions[0];
+            if (t2iResolutions.length > 0) document.getElementById('quality-btn-label').textContent = pickQuality(t2iResolutions);
             picker.setMaxImages(1);
             textarea.placeholder = t('image.placeholder');
         }
@@ -246,7 +259,7 @@ export function ImageStudio() {
     qualityBtn.style.display = _initResolutions.length > 0 ? 'flex' : 'none';
     if (_initResolutions.length > 0) {
         const qlabel = qualityBtn.querySelector('#quality-btn-label');
-        if (qlabel) qlabel.textContent = _initResolutions[0];
+        if (qlabel) qlabel.textContent = pickQuality(_initResolutions);
     }
 
     const generateBtn = document.createElement('button');
@@ -776,7 +789,7 @@ export function ImageStudio() {
                             e.stopPropagation();
                             selectedLocalModel = m.id;
                             document.getElementById('model-btn-label').textContent = m.name;
-                            selectedAr = m.aspectRatios[0];
+                            selectedAr = pickAr(m.aspectRatios);
                             document.getElementById('ar-btn-label').textContent = selectedAr;
                             qualityBtn.style.display = 'none';
                             closeDropdown();
@@ -806,14 +819,14 @@ export function ImageStudio() {
                         selectedModel = m.id;
                         selectedModelName = m.name;
                         const availableArs = getCurrentAspectRatios(selectedModel);
-                        selectedAr = availableArs[0];
+                        selectedAr = pickAr(availableArs);
                         document.getElementById('model-btn-label').textContent = selectedModelName;
                         document.getElementById('ar-btn-label').textContent = selectedAr;
 
                         const validResolutions = getCurrentResolutions(selectedModel);
                         qualityBtn.style.display = validResolutions.length > 0 ? 'flex' : 'none';
                         if (validResolutions.length > 0) {
-                            document.getElementById('quality-btn-label').textContent = validResolutions[0];
+                            document.getElementById('quality-btn-label').textContent = pickQuality(validResolutions);
                         }
 
                         // Update picker's max images when switching i2i models
@@ -855,6 +868,7 @@ export function ImageStudio() {
                 item.onclick = (e) => {
                     e.stopPropagation();
                     selectedAr = r;
+                    rememberLast({ ar: r });
                     document.getElementById('ar-btn-label').textContent = r;
                     closeDropdown();
                 };
@@ -879,6 +893,7 @@ export function ImageStudio() {
                 item.onclick = (e) => {
                     e.stopPropagation();
                     document.getElementById('quality-btn-label').textContent = opt;
+                    rememberLast({ quality: opt });
                     closeDropdown();
                 };
                 list.appendChild(item);
@@ -1137,14 +1152,14 @@ export function ImageStudio() {
         picker.setMaxImages(1);
         // Reset to t2i mode
         imageMode = false;
-        selectedModel = t2iModels[0].id;
-        selectedModelName = t2iModels[0].name;
-        selectedAr = getAspectRatiosForModel(selectedModel)[0];
+        selectedModel = lastT2iModel().id;
+        selectedModelName = lastT2iModel().name;
+        selectedAr = pickAr(getAspectRatiosForModel(selectedModel));
         document.getElementById('model-btn-label').textContent = selectedModelName;
         document.getElementById('ar-btn-label').textContent = selectedAr;
         const resetResolutions = getResolutionsForModel(selectedModel);
         qualityBtn.style.display = resetResolutions.length > 0 ? 'flex' : 'none';
-        if (resetResolutions.length > 0) document.getElementById('quality-btn-label').textContent = resetResolutions[0];
+        if (resetResolutions.length > 0) document.getElementById('quality-btn-label').textContent = pickQuality(resetResolutions);
         textarea.placeholder = t('image.placeholder');
         textarea.focus();
     };
@@ -1248,6 +1263,7 @@ export function ImageStudio() {
         let hadError = false;
         let capturedRequestId = null;
         const historyMeta = { prompt, model: selectedModel, aspect_ratio: selectedAr };
+        rememberLast({ ar: selectedAr, quality: document.getElementById('quality-btn-label')?.textContent, ...(imageMode ? {} : { model: selectedModel }) });
 
         try {
             let res;
