@@ -1,26 +1,21 @@
-import { t } from '../lib/i18n.js';
+import { Suspense, createElement as h, lazy } from 'react';
+import Studio from 'studio/AgentStudio';
+import { usePathname } from '../shims/next-navigation.js';
+import { mountReactStudio } from '../lib/reactStudio.js';
+
+// The studio's AgentStudio does list / chat / create inline; edit lives in the ai-agent package.
+const EditAgentPage = lazy(() => import('ai-agent/src/EditPage.jsx'));
+
+function AgentsView({ apiKey }) {
+    const path = usePathname();
+    if (path.startsWith('/agents/edit/')) {
+        const useUser = () => ({ user: null, isAuthorized: !!apiKey });
+        return h(Suspense, { fallback: null }, h(EditAgentPage, { useUser, usedIn: 'studio' }));
+    }
+    // Every inline agents view is drawn dark (bg-[#030303] text-white).
+    return h('div', { className: 'w-full h-full dark-island' }, h(Studio, { apiKey, locale: 'en' }));
+}
 
 export function AgentStudio() {
-    const container = document.createElement('div');
-    container.className = 'w-full h-full flex flex-col items-center justify-center bg-app-bg text-white gap-4';
-
-    const icon = document.createElement('div');
-    icon.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4">
-        <path d="M12 2a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4"/>
-        <path d="M8 14a6 6 0 0 0-6 6h20a6 6 0 0 0-6-6H8z"/>
-        <path d="M9 9h.01M15 9h.01"/>
-    </svg>`;
-
-    const title = document.createElement('p');
-    title.textContent = t('agents.title');
-    title.className = 'text-lg font-bold opacity-60';
-
-    const sub = document.createElement('p');
-    sub.textContent = t('agents.webOnly');
-    sub.className = 'text-sm opacity-40';
-
-    container.appendChild(icon);
-    container.appendChild(title);
-    container.appendChild(sub);
-    return container;
+    return mountReactStudio(AgentsView, '/agents');
 }
