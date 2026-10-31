@@ -17,6 +17,7 @@ export default {
 
         // Common
         'common.generate': '生成 ✨',
+        'common.close': '关闭',
         'price.free': '免费 · 在你的电脑上运行',
         'price.tooltip': '生成前由 MuAPI 估算的费用',
         'common.generating': '生成中...',

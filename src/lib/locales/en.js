@@ -17,6 +17,7 @@ export default {
 
         // Common
         'common.generate': 'Generate ✨',
+        'common.close': 'Close',
         'price.free': 'Free · on your computer',
         'price.tooltip': 'Estimated by MuAPI before you generate',
         'common.generating': 'Generating...',

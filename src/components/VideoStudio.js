@@ -4,6 +4,7 @@ import { AuthModal } from './AuthModal.js';
 import { t, tf } from '../lib/i18n.js';
 import { studioHeroHTML } from './studioHero.js';
 import { createUploadPicker } from './UploadPicker.js';
+import { addViewerClose } from './viewerClose.js';
 import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
@@ -1172,6 +1173,8 @@ export function VideoStudio() {
         hero.classList.remove('hidden', 'opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
         promptWrapper.classList.remove('hidden', 'opacity-40');
     };
+
+    addViewerClose(canvas, resetToPromptBar);
 
     newPromptBtn.onclick = () => {
         resetToPromptBar();

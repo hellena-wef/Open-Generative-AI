@@ -4,6 +4,7 @@ import { AuthModal } from './AuthModal.js';
 import { t, tf } from '../lib/i18n.js';
 import { studioHeroHTML } from './studioHero.js';
 import { createUploadPicker } from './UploadPicker.js';
+import { addViewerClose } from './viewerClose.js';
 import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 
@@ -611,13 +612,18 @@ export function LipSyncStudio() {
 
     regenerateBtn.onclick = () => generateBtn.click();
 
-    newBtn.onclick = () => {
+    const closeCanvas = () => {
         canvas.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10', 'scale-95');
         canvas.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
         canvasControls.classList.add('opacity-0');
         canvasControls.classList.remove('opacity-100');
         hero.classList.remove('hidden', 'opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
         promptWrapper.classList.remove('hidden', 'opacity-40');
+    };
+    addViewerClose(canvas, closeCanvas);
+
+    newBtn.onclick = () => {
+        closeCanvas();
         textarea.value = '';
         // Reset uploads
         imagePicker.reset();
