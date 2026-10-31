@@ -15,15 +15,12 @@ export function Header(navigate) {
 
     // Logo
     const logoContainer = document.createElement('div');
-    logoContainer.className = 'cursor-pointer hover:scale-110 transition-transform';
+    logoContainer.className = 'cursor-pointer flex items-center gap-2 group';
     logoContainer.innerHTML = `
-        <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1.5 shadow-lg">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="black"/>
-                <path d="M2 17L12 22L22 17" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 12L12 17L22 12" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </div>
+        <svg width="28" height="28" viewBox="-50 -50 100 100" class="text-white transition-transform duration-500 group-hover:rotate-45" aria-hidden="true">
+            <path fill="currentColor" d="M0-46C5-20 8-18 30-34 18-12 20-8 46-4 20 2 18 6 32 30 12 16 6 20 2 46-2 20-6 16-30 34-16 12-20 6-46 2-20-4-18-10-32-30-12-16-6-20 0-46Z"/>
+        </svg>
+        <span class="text-[22px] font-medium tracking-tight text-white leading-none">Faísca</span>
     `;
 
     const menu = document.createElement('nav');

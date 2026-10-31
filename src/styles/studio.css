@@ -40,7 +40,7 @@
     left: 0;
     right: 0;
     padding: 0.5rem;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    background: linear-gradient(transparent, rgba(252, 252, 250, 0.9));
     color: white;
     font-size: 0.75rem;
     font-weight: 600;
@@ -70,8 +70,8 @@
 }
 
 .prompt-field textarea {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(17, 17, 17, 0.03);
+    border: 1px solid rgba(17, 17, 17, 0.08);
     border-radius: var(--border-radius-md);
     padding: 0.75rem;
     color: white;
@@ -81,7 +81,7 @@
 }
 
 .prompt-field textarea:focus {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(17, 17, 17, 0.05);
     border-color: var(--color-primary);
     outline: none;
 }
@@ -102,9 +102,9 @@
 }
 
 .toolbar-btn {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(252, 252, 250, 0.85);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(17, 17, 17, 0.1);
     color: white;
     padding: 0.5rem;
     border-radius: var(--border-radius-md);

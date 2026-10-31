@@ -13,18 +13,28 @@ module.exports = {
     theme: {
         extend: {
             colors: {
+                // Faísca brand: paper, ink and a red marker.
+                // ponytail: the UI was written dark-first (text-white, bg-white/5, border-white/10
+                // in ~400 places), so "white" now means ink and "black" means paper. Every
+                // translucent white wash becomes a dark wash on light paper. Rename the classes
+                // if a dark theme ever comes back.
+                white: '#111111',
+                black: '#FCFCFA',
                 primary: {
-                    DEFAULT: '#22d3ee',
-                    hover: '#06b6d4',
+                    DEFAULT: '#E5251E',
+                    hover: '#C21C16',
                 },
-                'app-bg': '#050505',
-                'panel-bg': '#0a0a0a',
-                'card-bg': '#141414',
-                secondary: '#a1a1aa',
-                muted: '#52525b',
+                'app-bg': '#FCFCFA',
+                'panel-bg': '#F6F6F3',
+                'card-bg': '#F1F1EE',
+                secondary: '#55554F',
+                muted: '#8A8A84',
+                mint: '#A8F0E0',
+                butter: '#FFE98A',
             },
             fontFamily: {
-                sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                sans: ['"Hanken Grotesk"', 'system-ui', '-apple-system', 'sans-serif'],
+                script: ['"Mr Dafoe"', 'cursive'],
             },
             borderRadius: {
                 'xl': '1rem',
@@ -32,9 +42,10 @@ module.exports = {
                 '3xl': '2rem',
             },
             boxShadow: {
-                'glow': '0 0 20px rgba(34, 211, 238, 0.4)',
-                'glow-accent': '0 0 20px rgba(168, 85, 247, 0.4)',
-                '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.8)',
+                'glow': '0 0 0 1px rgba(229, 37, 30, 0.35)',
+                'glow-sm': '0 0 0 1px rgba(229, 37, 30, 0.25)',
+                'glow-accent': '0 0 0 1px rgba(17, 17, 17, 0.2)',
+                '3xl': '0 20px 40px -20px rgba(17, 17, 17, 0.18)',
             }
         },
     },

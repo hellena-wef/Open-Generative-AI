@@ -76,25 +76,12 @@ export function ImageStudio() {
     const hero = document.createElement('div');
     hero.className = 'flex flex-col items-center mb-10 md:mb-20 animate-fade-in-up transition-all duration-700';
     hero.innerHTML = `
-        <div class="mb-10 relative group">
-             <div class="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-40 group-hover:opacity-70 transition-opacity duration-1000"></div>
-             <div class="relative w-24 h-24 md:w-32 md:h-32 bg-teal-900/40 rounded-3xl flex items-center justify-center border border-white/5 overflow-hidden">
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-primary opacity-20 absolute -right-4 -bottom-4">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                </svg>
-                <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-glow relative z-10">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                        <circle cx="8.5" cy="8.5" r="1.5"/>
-                        <polyline points="21 15 16 10 5 21"/>
-                    </svg>
-                </div>
-                <!-- Sparkles -->
-                <div class="absolute top-4 right-4 text-primary animate-pulse">✨</div>
-             </div>
+        <h1 class="text-3xl sm:text-5xl md:text-7xl font-light text-white tracking-tight leading-none selection:bg-primary selection:text-black text-center px-4">${t('image.title')}</h1>
+        <div class="relative font-script text-primary text-6xl md:text-8xl leading-none -rotate-6 -mt-3 md:-mt-6 mb-6 select-none" aria-hidden="true">
+            Faísca
+            <svg class="absolute -right-14 bottom-0 w-12 h-10" viewBox="0 0 54 40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 12q4-6 8 0M30 10q4-6 8 0M8 26q18 16 36-2"/></svg>
         </div>
-        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">${t('image.title')}</h1>
-        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">${t('image.subtitle')}</p>
+        <p class="text-secondary text-sm font-medium tracking-wide">${t('image.subtitle')}</p>
     `;
     container.appendChild(hero);
 
@@ -106,7 +93,7 @@ export function ImageStudio() {
     promptWrapper.style.animationDelay = '0.2s';
 
     const bar = document.createElement('div');
-    bar.className = 'w-full bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-5 flex flex-col gap-3 md:gap-5 shadow-3xl';
+    bar.className = 'w-full bg-card-bg/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-5 flex flex-col gap-3 md:gap-5 shadow-3xl';
 
     // Top Row: Input
     const topRow = document.createElement('div');
@@ -304,7 +291,7 @@ export function ImageStudio() {
     
     // Build tools panel HTML
     toolsPanel.innerHTML = `
-        <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
+        <div class="bg-card-bg/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
             <div class="flex items-center justify-between pb-3 border-b border-white/5">
                 <h3 class="text-sm font-bold text-white">${t('image.quickTools')}</h3>
                 <button id="close-tools-btn" class="text-white/40 hover:text-white transition-colors">
@@ -371,7 +358,7 @@ export function ImageStudio() {
     advancedPanel.className = 'w-full max-w-4xl mt-6 animate-fade-in-up hidden';
     advancedPanel.id = 'advanced-panel';
     advancedPanel.innerHTML = `
-        <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
+        <div class="bg-card-bg/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
             <div class="flex items-center justify-between pb-3 border-b border-white/5">
                 <h3 class="text-sm font-bold text-white">${t('image.advancedOptions')}</h3>
                 <button id="close-adv-btn" class="text-white/40 hover:text-white transition-colors">
@@ -783,7 +770,7 @@ export function ImageStudio() {
                     item.className = `flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-white/5 ${selectedModel === m.id ? 'bg-white/5 border-white/5' : ''}`;
                     item.innerHTML = `
                         <div class="flex items-center gap-3.5">
-                             <div class="w-10 h-10 ${m.family === 'kontext' ? 'bg-blue-500/10 text-blue-400' : m.family === 'effects' ? 'bg-purple-500/10 text-purple-400' : 'bg-primary/10 text-primary'} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase">${m.name.charAt(0)}</div>
+                             <div class="w-10 h-10 ${m.family === 'kontext' ? 'bg-blue-500/10 text-blue-400' : m.family === 'effects' ? 'bg-butter text-white' : 'bg-primary/10 text-primary'} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase">${m.name.charAt(0)}</div>
                              <div class="flex flex-col gap-0.5">
                                 <span class="text-xs font-bold text-white tracking-tight">${m.name}</span>
                              </div>
@@ -1069,7 +1056,7 @@ export function ImageStudio() {
         if (!apiKey) return; // can't poll without key; jobs remain for next time
 
         const banner = document.createElement('div');
-        banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#111] border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
+        banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-card-bg border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
         banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">Resuming ${pending.length} pending generation${pending.length > 1 ? 's' : ''}…</span>`;
         document.body.appendChild(banner);
 
