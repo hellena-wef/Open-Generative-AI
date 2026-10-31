@@ -124,7 +124,22 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
         const btnRect = trigger.getBoundingClientRect();
         const containerRect = anchorContainer.getBoundingClientRect();
         panel.style.left = `${btnRect.left - containerRect.left}px`;
-        panel.style.bottom = `${containerRect.bottom - btnRect.top + 8}px`;
+        // Open upward when it fits under the header, otherwise downward; scroll if neither side fits.
+        const headerBottom = document.querySelector('header')?.getBoundingClientRect().bottom || 0;
+        const spaceAbove = btnRect.top - headerBottom - 16;
+        const spaceBelow = window.innerHeight - btnRect.bottom - 16;
+        const openUp = panel.scrollHeight <= spaceAbove || spaceAbove >= spaceBelow;
+        panel.style.maxHeight = `${Math.max(160, openUp ? spaceAbove : spaceBelow)}px`;
+        panel.style.overflowY = 'auto';
+        panel.classList.toggle('origin-bottom-left', openUp);
+        panel.classList.toggle('origin-top-left', !openUp);
+        if (openUp) {
+            panel.style.top = '';
+            panel.style.bottom = `${containerRect.bottom - btnRect.top + 8}px`;
+        } else {
+            panel.style.bottom = '';
+            panel.style.top = `${btnRect.bottom - containerRect.top + 8}px`;
+        }
         panelOpen = true;
     };
 
