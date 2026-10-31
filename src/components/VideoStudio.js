@@ -5,6 +5,7 @@ import { t, tf } from '../lib/i18n.js';
 import { studioHeroHTML } from './studioHero.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { addViewerClose } from './viewerClose.js';
+import { activeLook, applyLook } from '../lib/brands.js';
 import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
@@ -1214,7 +1215,8 @@ export function VideoStudio() {
     // 5. GENERATION LOGIC
     // ==========================================
     generateBtn.onclick = async () => {
-        const prompt = textarea.value.trim();
+        const typedPrompt = textarea.value.trim();
+        const prompt = typedPrompt ? applyLook(typedPrompt, activeLook()) : '';
         const model = getCurrentModel();
         const isExtendMode = model?.requiresRequestId;
 
@@ -1242,7 +1244,7 @@ export function VideoStudio() {
                 return;
             }
         } else {
-            if (!prompt) {
+            if (!typedPrompt) {
                 alert(t('video.alertNoPrompt'));
                 return;
             }
@@ -1284,7 +1286,7 @@ export function VideoStudio() {
 
         let hadError = false;
         let capturedRequestId = null;
-        const historyMeta = { prompt, model: selectedModel, aspect_ratio: selectedAr, duration: selectedDuration };
+        const historyMeta = { prompt: typedPrompt, model: selectedModel, aspect_ratio: selectedAr, duration: selectedDuration };
 
         const onRequestId = (rid) => {
             capturedRequestId = rid;

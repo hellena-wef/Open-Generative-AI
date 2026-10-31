@@ -11,6 +11,7 @@ import { AuthModal } from './AuthModal.js';
 import { t, tf } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { addViewerClose } from './viewerClose.js';
+import { activeLook, applyLook, BRAND_CHANGE_EVENT } from '../lib/brands.js';
 import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { downloadImage } from '../../packages/studio/src/utils/downloadImage.js';
@@ -41,6 +42,7 @@ export function ImageStudio() {
         last = { ...last, ...patch };
         try { localStorage.setItem(LAST_KEY, JSON.stringify(last)); } catch { /* storage full */ }
     };
+    const editModelFor = (t2iId) => getI2IModelById(`${t2iId}-edit`) || getI2IModelById(t2iId.replace('-text-to-image', '-image-to-image'));
     const pickAr = (list) => (list.includes(last.ar) ? last.ar : list[0]);
     const pickQuality = (list) => (list.includes(last.quality) ? last.quality : list[0]);
     const lastT2iModel = () => t2iModels.find(m => m.id === last.model) || t2iModels[0];
@@ -280,6 +282,24 @@ export function ImageStudio() {
         if (imageMode) payload.images_list = uploadedImageUrls;
         return { endpoint: info.endpoint || selectedModel, payload };
     });
+    // Active brand label in the bar; switching brand applies its default aspect ratio.
+    const brandChip = document.createElement('span');
+    brandChip.className = 'font-mono text-[10px] uppercase tracking-[0.12em] text-primary whitespace-nowrap self-center empty:hidden';
+    const syncBrand = (applyDefaults) => {
+        if (!brandChip.isConnected && applyDefaults) return window.removeEventListener(BRAND_CHANGE_EVENT, onBrandChange);
+        const look = activeLook();
+        brandChip.textContent = look ? `✳ ${look.label}` : '';
+        brandChip.title = look ? applyLook('', look) : '';
+        if (applyDefaults && look?.ar && getCurrentAspectRatios(selectedModel).includes(look.ar)) {
+            selectedAr = look.ar;
+            document.getElementById('ar-btn-label').textContent = selectedAr;
+            rememberLast({ ar: selectedAr });
+        }
+    };
+    const onBrandChange = () => syncBrand(true);
+    controlsLeft.prepend(brandChip);
+    window.addEventListener(BRAND_CHANGE_EVENT, onBrandChange);
+    syncBrand(false);
     bar.appendChild(bottomRow);
     promptWrapper.appendChild(bar);
     container.appendChild(promptWrapper);
@@ -1168,14 +1188,18 @@ export function ImageStudio() {
     // 5. GENERATION LOGIC
     // ==========================================
     generateBtn.onclick = async () => {
-        const prompt = textarea.value.trim();
+        const typedPrompt = textarea.value.trim();
+        // Active brand/project look: style text goes into the prompt, references into the images.
+        const look = activeLook();
+        const prompt = applyLook(typedPrompt, look);
+        const brandRefs = look?.refs || [];
         if (imageMode) {
             if (uploadedImageUrls.length === 0) {
                 alert(t('image.alertNoRefImage'));
                 return;
             }
         } else {
-            if (!prompt) {
+            if (!typedPrompt) {
                 alert(t('image.alertNoPrompt'));
                 return;
             }
@@ -1262,17 +1286,18 @@ export function ImageStudio() {
 
         let hadError = false;
         let capturedRequestId = null;
-        const historyMeta = { prompt, model: selectedModel, aspect_ratio: selectedAr };
+        const historyMeta = { prompt: typedPrompt, model: selectedModel, aspect_ratio: selectedAr };
         rememberLast({ ar: selectedAr, quality: document.getElementById('quality-btn-label')?.textContent, ...(imageMode ? {} : { model: selectedModel }) });
 
         try {
             let res;
             const qualityLabel = document.getElementById('quality-btn-label')?.textContent;
             if (imageMode) {
+                const images = [...uploadedImageUrls, ...brandRefs].slice(0, getMaxImagesForI2IModel(selectedModel) || undefined);
                 const genParams = {
                     model: selectedModel,
-                    images_list: uploadedImageUrls,
-                    image_url: uploadedImageUrls[0], // backward compat for single-image models
+                    images_list: images,
+                    image_url: images[0], // backward compat for single-image models
                     aspect_ratio: selectedAr,
                     onRequestId: (rid) => {
                         capturedRequestId = rid;
@@ -1281,6 +1306,24 @@ export function ImageStudio() {
                 };
                 if (prompt) genParams.prompt = prompt;
                 const qualityField = getCurrentQualityField(selectedModel);
+                if (qualityField && qualityLabel) genParams[qualityField] = qualityLabel;
+                res = await muapi.generateI2I(genParams);
+            } else if (brandRefs.length && editModelFor(selectedModel)) {
+                // Text-to-image with brand references: use the same family's edit model.
+                const editModel = editModelFor(selectedModel);
+                const images = brandRefs.slice(0, editModel.maxImages || brandRefs.length);
+                const genParams = {
+                    model: editModel.id,
+                    prompt,
+                    images_list: images,
+                    image_url: images[0],
+                    aspect_ratio: selectedAr,
+                    onRequestId: (rid) => {
+                        capturedRequestId = rid;
+                        savePendingJob({ requestId: rid, studioType: 'image', historyMeta, maxAttempts: 60, interval: 2000, submittedAt: Date.now() });
+                    }
+                };
+                const qualityField = getQualityFieldForI2IModel(editModel.id);
                 if (qualityField && qualityLabel) genParams[qualityField] = qualityLabel;
                 res = await muapi.generateI2I(genParams);
             } else {

@@ -3,6 +3,7 @@ import { muapi } from '../lib/muapi.js';
 import { CameraControls } from './CameraControls.js';
 import { buildNanoBananaPrompt, CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT } from '../lib/promptUtils.js';
 import { AuthModal } from './AuthModal.js';
+import { activeLook, applyLook } from '../lib/brands.js';
 import { attachPriceTag } from './PriceTag.js';
 import { t } from '../lib/i18n.js';
 
@@ -540,8 +541,9 @@ export function CinemaStudio() {
     // 5. GENERATION LOGIC UPDATE
     // ==========================================
     generateBtn.onclick = async () => {
-        const basePrompt = textarea.value.trim();
-        if (!basePrompt) return;
+        const typedPrompt = textarea.value.trim();
+        if (!typedPrompt) return;
+        const basePrompt = applyLook(typedPrompt, activeLook());
 
         const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) {

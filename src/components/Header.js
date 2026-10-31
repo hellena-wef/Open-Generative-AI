@@ -1,5 +1,7 @@
 import { SettingsModal } from './SettingsModal.js';
 import { t, getLang, setLang, LANGUAGES } from '../lib/i18n.js';
+import { BrandManager } from './BrandManager.js';
+import { getBrands, getActive, setActive, BRAND_CHANGE_EVENT } from '../lib/brands.js';
 
 export function Header(navigate) {
     const header = document.createElement('header');
@@ -85,6 +87,35 @@ export function Header(navigate) {
     }
     langBtn.onchange = () => setLang(langBtn.value);
 
+    // Brand / project picker: the active look is applied to every generation.
+    const brandSelect = document.createElement('select');
+    brandSelect.className = 'max-w-[16rem] px-2 py-1.5 rounded-md border border-primary/30 bg-primary/5 text-[13px] font-medium text-white hover:border-primary/60 transition-colors cursor-pointer outline-none';
+    brandSelect.title = t('brand.pickerTitle');
+    brandSelect.setAttribute('aria-label', t('brand.pickerTitle'));
+    const fillBrands = () => {
+        const { brandId, projectId } = getActive();
+        brandSelect.replaceChildren(new Option(t('brand.none'), ''));
+        for (const b of getBrands()) {
+            brandSelect.add(new Option(b.name, b.id, false, b.id === brandId && !projectId));
+            for (const p of b.projects) {
+                brandSelect.add(new Option(`${b.name} · ${p.name}`, `${b.id}/${p.id}`, false, b.id === brandId && p.id === projectId));
+            }
+        }
+        brandSelect.add(new Option(`${t('brand.manage')}…`, '__manage'));
+    };
+    brandSelect.onchange = () => {
+        if (brandSelect.value === '__manage') {
+            fillBrands();
+            document.body.appendChild(BrandManager());
+            return;
+        }
+        const [brandId, projectId] = brandSelect.value.split('/');
+        setActive(brandId || null, projectId || null);
+    };
+    window.addEventListener(BRAND_CHANGE_EVENT, fillBrands);
+    fillBrands();
+
+    rightPart.appendChild(brandSelect);
     rightPart.appendChild(langBtn);
     rightPart.appendChild(settingsBtn);
 
