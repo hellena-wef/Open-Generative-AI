@@ -2,7 +2,7 @@ import { muapi } from '../lib/muapi.js';
 import {
     t2iModels, getAspectRatiosForModel, getResolutionsForModel, getQualityFieldForModel,
     i2iModels, getAspectRatiosForI2IModel, getResolutionsForI2IModel, getQualityFieldForI2IModel,
-    getMaxImagesForI2IModel
+    getMaxImagesForI2IModel, getModelById, getI2IModelById
 } from '../lib/models.js';
 import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
 import { LOCAL_MODEL_CATALOG, getLocalModelById } from '../lib/localModels.js';
@@ -10,6 +10,7 @@ import { ENHANCE_TAGS, QUICK_PROMPTS } from '../lib/promptUtils.js';
 import { AuthModal } from './AuthModal.js';
 import { t, tf } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
+import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { downloadImage } from '../../packages/studio/src/utils/downloadImage.js';
 import { appendGenerationRefundNotice } from '../../packages/studio/src/utils/generationLifecycle.js';
@@ -254,6 +255,17 @@ export function ImageStudio() {
 
     bottomRow.appendChild(controlsLeft);
     bottomRow.appendChild(generateBtn);
+    attachPriceTag(generateBtn, () => {
+        if (useLocalModel) return { local: true };
+        const info = imageMode ? getI2IModelById(selectedModel) : getModelById(selectedModel);
+        if (!info) return null;
+        const payload = { prompt: 'x', aspect_ratio: selectedAr };
+        const qualityField = getCurrentQualityField(selectedModel);
+        const qualityLabel = document.getElementById('quality-btn-label')?.textContent;
+        if (qualityField && qualityLabel) payload[qualityField] = qualityLabel;
+        if (imageMode) payload.images_list = uploadedImageUrls;
+        return { endpoint: info.endpoint || selectedModel, payload };
+    });
     bar.appendChild(bottomRow);
     promptWrapper.appendChild(bar);
     container.appendChild(promptWrapper);

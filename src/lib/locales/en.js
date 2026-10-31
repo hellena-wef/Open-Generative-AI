@@ -17,6 +17,8 @@ export default {
 
         // Common
         'common.generate': 'Generate ✨',
+        'price.free': 'Free · on your computer',
+        'price.tooltip': 'Estimated by MuAPI before you generate',
         'common.generating': 'Generating...',
         'common.download': '↓ Download',
         'common.cancel': 'Cancel',

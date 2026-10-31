@@ -4,6 +4,7 @@ import { AuthModal } from './AuthModal.js';
 import { t, tf } from '../lib/i18n.js';
 import { studioHeroHTML } from './studioHero.js';
 import { createUploadPicker } from './UploadPicker.js';
+import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 
 export function LipSyncStudio() {
@@ -285,6 +286,13 @@ export function LipSyncStudio() {
     bottomRow.appendChild(modelBtn);
     bottomRow.appendChild(resolutionBtn);
     bottomRow.appendChild(generateBtn);
+    attachPriceTag(generateBtn, () => {
+        const info = getLipSyncModelById(selectedModel);
+        if (!info) return null;
+        const payload = {};
+        if (getResolutionsForLipSyncModel(selectedModel).length > 0) payload.resolution = selectedResolution;
+        return { endpoint: info.endpoint || selectedModel, payload };
+    });
     bar.appendChild(bottomRow);
 
     promptWrapper.appendChild(bar);

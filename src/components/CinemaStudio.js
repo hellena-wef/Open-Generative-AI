@@ -3,6 +3,7 @@ import { muapi } from '../lib/muapi.js';
 import { CameraControls } from './CameraControls.js';
 import { buildNanoBananaPrompt, CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT } from '../lib/promptUtils.js';
 import { AuthModal } from './AuthModal.js';
+import { attachPriceTag } from './PriceTag.js';
 import { t } from '../lib/i18n.js';
 
 export function CinemaStudio() {
@@ -241,6 +242,10 @@ export function CinemaStudio() {
 
     rightGroup.appendChild(summaryCard);
     rightGroup.appendChild(generateBtn);
+    attachPriceTag(generateBtn, () => ({
+        endpoint: 'nano-banana-pro',
+        payload: { prompt: 'x', aspect_ratio: currentSettings.aspect_ratio, resolution: (resBtn.dataset.value || '1k').toLowerCase() },
+    }));
     promptBar.appendChild(rightGroup);
 
     promptBarWrapper.appendChild(promptBar);

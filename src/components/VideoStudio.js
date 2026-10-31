@@ -1,9 +1,10 @@
 import { muapi } from '../lib/muapi.js';
-import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels } from '../lib/models.js';
+import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels, getVideoModelById, getI2VModelById, getV2VModelById } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
 import { t, tf } from '../lib/i18n.js';
 import { studioHeroHTML } from './studioHero.js';
 import { createUploadPicker } from './UploadPicker.js';
+import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
 import { isWan2gpModelId, getLocalModelById, localT2VModels, localI2VModels } from '../lib/localModels.js';
@@ -493,6 +494,17 @@ export function VideoStudio() {
     bottomRow.appendChild(controlsLeft);
     bottomRow.appendChild(generateBtn);
     bar.appendChild(bottomRow);
+    attachPriceTag(generateBtn, () => {
+        if (useLocalModel && isWan2gpModelId(selectedModel)) return { local: true };
+        const info = v2vMode ? getV2VModelById(selectedModel) : imageMode ? getI2VModelById(selectedModel) : getVideoModelById(selectedModel);
+        if (!info) return null;
+        const payload = { prompt: 'x', aspect_ratio: selectedAr };
+        if (getCurrentDurations(selectedModel).length > 0) payload.duration = selectedDuration;
+        if (getCurrentResolutions(selectedModel).length > 0) payload.resolution = selectedResolution;
+        if (selectedQuality) payload.quality = selectedQuality;
+        if (selectedMode) payload.mode = selectedMode;
+        return { endpoint: info.endpoint || selectedModel, payload };
+    });
     promptWrapper.appendChild(bar);
     container.appendChild(promptWrapper);
 
