@@ -77,9 +77,15 @@ export function ImageStudio() {
     hero.className = 'flex flex-col items-center mb-10 md:mb-20 animate-fade-in-up transition-all duration-700';
     hero.innerHTML = `
         <h1 class="text-3xl sm:text-5xl md:text-7xl font-light text-white tracking-tight leading-none selection:bg-primary selection:text-black text-center px-4">${t('image.title')}</h1>
-        <div class="relative font-script text-primary text-6xl md:text-8xl leading-none -rotate-6 -mt-3 md:-mt-6 mb-6 select-none" aria-hidden="true">
+        <div class="relative font-script text-primary text-6xl md:text-8xl leading-none -rotate-6 -mt-3 md:-mt-6 mb-8 select-none" aria-hidden="true">
+            <span class="absolute inset-x-6 inset-y-2 rounded-full bg-primary/15 -z-10" style="filter: blur(28px)"></span>
             Faísca
-            <svg class="absolute -right-14 bottom-0 w-12 h-10" viewBox="0 0 54 40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 12q4-6 8 0M30 10q4-6 8 0M8 26q18 16 36-2"/></svg>
+            <svg class="absolute -right-16 top-8 w-12 h-10" viewBox="0 0 54 40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 12q4-6 8 0M30 10q4-6 8 0M8 26q18 16 36-2"/></svg>
+        </div>
+        <div class="w-full max-w-xl px-4 mb-4 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.15em] text-white">
+            <span>${t('image.title')}</span>
+            <svg width="12" height="12" viewBox="-50 -50 100 100" class="text-primary" aria-hidden="true"><path fill="currentColor" d="M0-46C5-20 8-18 30-34 18-12 20-8 46-4 20 2 18 6 32 30 12 16 6 20 2 46-2 20-6 16-30 34-16 12-20 6-46 2-20-4-18-10-32-30-12-16-6-20 0-46Z"/></svg>
+            <span>Lab criativo local</span>
         </div>
         <p class="text-secondary text-sm font-medium tracking-wide">${t('image.subtitle')}</p>
     `;

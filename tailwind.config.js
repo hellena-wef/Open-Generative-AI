@@ -35,6 +35,7 @@ module.exports = {
             fontFamily: {
                 sans: ['"Hanken Grotesk"', 'system-ui', '-apple-system', 'sans-serif'],
                 script: ['"Mr Dafoe"', 'cursive'],
+                mono: ['"Space Mono"', 'ui-monospace', 'monospace'],
             },
             borderRadius: {
                 'xl': '1rem',

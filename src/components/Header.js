@@ -21,10 +21,11 @@ export function Header(navigate) {
             <path fill="currentColor" d="M0-46C5-20 8-18 30-34 18-12 20-8 46-4 20 2 18 6 32 30 12 16 6 20 2 46-2 20-6 16-30 34-16 12-20 6-46 2-20-4-18-10-32-30-12-16-6-20 0-46Z"/>
         </svg>
         <span class="text-[22px] font-medium tracking-tight text-white leading-none">Faísca</span>
+        <span class="font-mono text-[10px] uppercase tracking-[0.15em] text-secondary self-end">lab</span>
     `;
 
     const menu = document.createElement('nav');
-    menu.className = 'hidden lg:flex items-center gap-6 text-[13px] font-bold text-secondary';
+    menu.className = 'hidden lg:flex items-center gap-6 font-mono text-[11px] uppercase tracking-[0.12em] text-secondary';
     const items = [
         { label: t('nav.image'),   page: 'image' },
         { label: t('nav.video'),   page: 'video' },
