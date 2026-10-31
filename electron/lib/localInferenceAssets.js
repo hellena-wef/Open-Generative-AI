@@ -1,7 +1,20 @@
 const path = require('path');
 
-function pickBinaryAssetForPlatform({ platform, arch, zipNames }) {
-    const isSdCliZip = (name) => name.startsWith('sd-master-') || name.includes('-bin-');
+const WIN_CPU_TAGS = ['win-cpu-x64', 'win-avx2-x64', 'win-avx-x64', 'win-avx512-x64', 'win-noavx-x64'];
+const WIN_CUDA_TAGS = ['win-cuda12-x64', 'win-cu12-x64'];
+
+// DLLs the CUDA build needs but does not ship; leejet publishes them separately
+// as cudart-sd-bin-win-cu12-x64.zip in the same release.
+const CUDA_RUNTIME_DLLS = ['cudart64_12.dll', 'cublas64_12.dll', 'cublasLt64_12.dll'];
+
+const isCudaBuild = (name) => WIN_CUDA_TAGS.some((tag) => name.includes(tag));
+
+function pickCudaRuntimeAsset(zipNames) {
+    return zipNames.find((name) => name.startsWith('cudart-') && name.includes('win-cu12-x64')) || null;
+}
+
+function pickBinaryAssetForPlatform({ platform, arch, zipNames, hasNvidiaGpu = false }) {
+    const isSdCliZip = (name) => !name.startsWith('cudart-') && (name.startsWith('sd-master-') || name.includes('-bin-'));
     const candidates = zipNames.filter(isSdCliZip);
 
     if (platform === 'darwin') {
@@ -10,8 +23,9 @@ function pickBinaryAssetForPlatform({ platform, arch, zipNames }) {
     }
 
     if (platform === 'win32') {
-        const winCandidates = candidates.filter((name) => /win-(avx2?|avx512|noavx|cuda12|cu12)-x64/.test(name));
-        const order = ['win-avx2-x64', 'win-avx-x64', 'win-avx512-x64', 'win-noavx-x64', 'win-cuda12-x64', 'win-cu12-x64'];
+        const winCandidates = candidates.filter((name) => /win-(cpu|avx2?|avx512|noavx|cuda12|cu12)-x64/.test(name));
+        // CUDA builds are useless without an NVIDIA GPU, so only consider them when one is present.
+        const order = hasNvidiaGpu ? [...WIN_CUDA_TAGS, ...WIN_CPU_TAGS] : WIN_CPU_TAGS;
         for (const tag of order) {
             const hit = winCandidates.find((name) => name.includes(tag));
             if (hit) return hit;
@@ -44,6 +58,9 @@ function getBundledBinaryResourceDir({ resourcesPath, platform, arch }) {
 }
 
 module.exports = {
+    CUDA_RUNTIME_DLLS,
     getBundledBinaryResourceDir,
+    isCudaBuild,
     pickBinaryAssetForPlatform,
+    pickCudaRuntimeAsset,
 };

@@ -5,9 +5,13 @@ const https = require('https');
 const http = require('http');
 const { spawn, execFile } = require('child_process');
 const {
+    CUDA_RUNTIME_DLLS,
     getBundledBinaryResourceDir,
+    isCudaBuild,
     pickBinaryAssetForPlatform,
+    pickCudaRuntimeAsset,
 } = require('./localInferenceAssets');
+const { freeRamGB, planMemory, queryNvidiaGpus } = require('./localHardware');
 const {
     formatStartupProgressMessage,
     parseGenerationProgressChunk,
@@ -88,14 +92,14 @@ function downloadFile(url, destPath, onProgress) {
         };
         if (alreadyDownloaded > 0) reqHeaders['Range'] = `bytes=${alreadyDownloaded}-`;
 
-        const req = mod.get({ hostname: parsed.hostname, path: parsed.pathname + parsed.search, headers: reqHeaders }, (res) => {
+        const req = mod.get(parsed, { headers: reqHeaders }, (res) => {
             const { statusCode, headers } = res;
 
-            // Follow redirects
+            // Follow redirects (Location may be relative, e.g. after a Hugging Face repo rename)
             if ([301, 302, 303, 307, 308].includes(statusCode)) {
                 res.resume();
                 if (redirectsLeft <= 0) { reject(new Error('Too many redirects')); return; }
-                resolve(attempt(headers.location, redirectsLeft - 1, retriesLeft));
+                resolve(attempt(new URL(headers.location, requestUrl).href, redirectsLeft - 1, retriesLeft));
                 return;
             }
 
@@ -213,8 +217,19 @@ function ensureBundledBinaryInstalled() {
     return fs.existsSync(BINARY_PATH);
 }
 
+// A CUDA build without its runtime DLLs silently falls back to CPU and can exhaust RAM.
+function isCudaRuntimeMissing() {
+    if (process.platform !== 'win32' || !fs.existsSync(path.join(BIN_DIR, 'ggml-cuda.dll'))) return false;
+    return CUDA_RUNTIME_DLLS.some((dll) => !fs.existsSync(path.join(BIN_DIR, dll)));
+}
+
+function isCudaBinaryInstalled() {
+    return process.platform === 'win32' && fs.existsSync(path.join(BIN_DIR, 'ggml-cuda.dll'));
+}
+
 async function getBinaryStatus() {
-    const exists = ensureBundledBinaryInstalled() || fs.existsSync(BINARY_PATH);
+    // Reporting "not installed" makes the UI offer the download again, which repairs the runtime.
+    const exists = (ensureBundledBinaryInstalled() || fs.existsSync(BINARY_PATH)) && !isCudaRuntimeMissing();
     return {
         exists,
         path: BINARY_PATH,
@@ -236,7 +251,7 @@ async function downloadBinary(mainWindow) {
     try {
         send({ phase: 'fetching-release', progress: 0 });
 
-        if (ensureBundledBinaryInstalled()) {
+        if (ensureBundledBinaryInstalled() && !isCudaRuntimeMissing()) {
             send({ phase: 'done', progress: 1 });
             return { ok: true, source: 'bundled' };
         }
@@ -244,12 +259,12 @@ async function downloadBinary(mainWindow) {
         const platformKey = `${process.platform}-${process.arch}`;
         const customUrl = CUSTOM_BINARIES[platformKey];
 
-        let downloadUrl, zipName;
+        const assets = []; // [{ url, name }] downloaded and extracted in order
 
         if (customUrl) {
-            downloadUrl = customUrl;
-            zipName = path.basename(customUrl);
+            assets.push({ url: customUrl, name: path.basename(customUrl) });
         } else {
+            const hasNvidiaGpu = process.platform === 'win32' && (await queryNvidiaGpus()).length > 0;
             // Walk recent releases until we find one that actually ships a
             // build for this platform. leejet sometimes publishes a partial
             // release (e.g. master-587 ships only Mac arm64 + Linux ROCm),
@@ -268,11 +283,18 @@ async function downloadBinary(mainWindow) {
                     platform: process.platform,
                     arch: process.arch,
                     zipNames: lastSeen,
+                    hasNvidiaGpu,
                 });
-                if (pickedName) {
-                    chosen = zips.find(a => a.name === pickedName);
-                    break;
+                if (!pickedName) continue;
+                if (isCudaBuild(pickedName)) {
+                    // The CUDA build only works with the runtime DLLs from the same release.
+                    const runtimeName = pickCudaRuntimeAsset(lastSeen);
+                    if (!runtimeName) continue;
+                    const runtime = zips.find(a => a.name === runtimeName);
+                    assets.push({ url: runtime.browser_download_url, name: runtime.name });
                 }
+                chosen = zips.find(a => a.name === pickedName);
+                break;
             }
 
             if (!chosen) {
@@ -285,19 +307,29 @@ async function downloadBinary(mainWindow) {
                 const available = lastSeen.join(', ') || '(none)';
                 throw new Error(`No binary found for ${process.platform}-${process.arch} in the last 15 releases. Latest release assets: ${available}`);
             }
-            downloadUrl = chosen.browser_download_url;
-            zipName = chosen.name;
+            assets.unshift({ url: chosen.browser_download_url, name: chosen.name });
         }
 
-        send({ phase: 'downloading', progress: 0 });
-        const zipPath = path.join(BIN_DIR, zipName);
-        await downloadFile(downloadUrl, zipPath, (p) => {
-            send({ phase: 'downloading', progress: p });
-        });
+        for (const [i, asset] of assets.entries()) {
+            // Spread progress across all archives so the bar never jumps backwards.
+            const scale = (p) => (i + p) / assets.length;
+            send({ phase: 'downloading', progress: scale(0) });
+            const zipPath = path.join(BIN_DIR, asset.name);
+            await downloadFile(asset.url, zipPath, (p) => {
+                send({ phase: 'downloading', progress: scale(p * 0.95) });
+            });
 
-        send({ phase: 'extracting', progress: 0.95 });
-        await extractZip(zipPath, BIN_DIR);
-        fs.unlinkSync(zipPath);
+            send({ phase: 'extracting', progress: scale(0.95) });
+            await extractZip(zipPath, BIN_DIR);
+            fs.unlinkSync(zipPath);
+        }
+
+        // Runtime DLLs must sit next to sd-cli.exe for Windows to load them.
+        for (const dll of CUDA_RUNTIME_DLLS) {
+            const found = findFile(BIN_DIR, dll);
+            if (found && found !== path.join(BIN_DIR, dll)) fs.renameSync(found, path.join(BIN_DIR, dll));
+        }
+        if (isCudaRuntimeMissing()) throw new Error(`CUDA build installed but runtime DLLs are missing (${CUDA_RUNTIME_DLLS.join(', ')}).`);
 
         // The zip may extract into a subdirectory — find the binary wherever it landed
         const foundBinary = findFile(BIN_DIR, BINARY_NAME);
@@ -429,6 +461,7 @@ async function generate(params, mainWindow) {
 
     ensureBundledBinaryInstalled();
     if (!fs.existsSync(BINARY_PATH)) throw new Error('sd.cpp binary not installed. Download it in Settings > Local Models.');
+    if (isCudaRuntimeMissing()) throw new Error('GPU engine is missing its CUDA runtime files. Re-download the engine in Settings > Local Models.');
 
     const model = LOCAL_MODEL_CATALOG.find(m => m.id === params.model);
     if (!model) throw new Error(`Unknown local model: ${params.model}`);
@@ -442,6 +475,18 @@ async function generate(params, mainWindow) {
         if (!fs.existsSync(llmPath)) throw new Error('Text encoder (Qwen3-4B) not downloaded. Go to Settings > Local Models and download all required files for Z-Image.');
         if (!fs.existsSync(vaePath)) throw new Error('VAE (ae.safetensors) not downloaded. Go to Settings > Local Models and download all required files for Z-Image.');
     }
+
+    // Check RAM/VRAM before spawning: a model that doesn't fit can freeze the whole machine.
+    const useGpu = isCudaBinaryInstalled();
+    const weightsGB = model.sizeGB
+        + (model.requiresAuxiliary ? ZIMAGE_AUXILIARY.llm.sizeGB + ZIMAGE_AUXILIARY.vae.sizeGB : 0);
+    const memoryPlan = planMemory({
+        weightsGB,
+        useGpu,
+        gpus: useGpu ? await queryNvidiaGpus() : [],
+        freeRamGB: freeRamGB(),
+    });
+    if (!memoryPlan.ok) throw new Error(memoryPlan.message);
 
     const [width, height] = arToDimensions(params.aspect_ratio || '1:1', model.type);
     const seed = params.seed && params.seed !== -1 ? params.seed : Math.floor(Math.random() * 2147483647);
@@ -472,6 +517,11 @@ async function generate(params, mainWindow) {
 
     if (params.negative_prompt) {
         args.push('-n', params.negative_prompt);
+    }
+
+    // Not enough VRAM but enough RAM: keep weights in RAM and stream them to the GPU.
+    if (memoryPlan.offload) {
+        args.push('--offload-to-cpu', '--vae-tiling');
     }
 
     if (model.type === 'z-image') {
