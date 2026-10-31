@@ -1238,7 +1238,7 @@ export function ImageStudio() {
 
         hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
         generateBtn.disabled = true;
-        generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> Generating...`;
+        generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> ${t('common.generating')}`;
 
         let hadError = false;
         let capturedRequestId = null;

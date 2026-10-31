@@ -5,12 +5,12 @@ import { estimatePrice, formatUsd } from '../lib/pricing.js';
 // getRequest() returns { local: true }, { endpoint, payload }, or null (nothing to price).
 export function attachPriceTag(generateBtn, getRequest) {
     const tag = document.createElement('span');
-    tag.className = 'font-mono text-[11px] uppercase tracking-[0.1em] text-white whitespace-nowrap shrink-0 self-center mr-3';
+    tag.className = 'font-mono text-[10px] uppercase tracking-[0.1em] text-white whitespace-nowrap leading-none empty:hidden';
     tag.title = t('price.tooltip');
     const wrap = document.createElement('div');
-    wrap.className = 'flex items-center shrink-0';
+    wrap.className = 'flex flex-col items-center gap-1.5 shrink-0';
     generateBtn.replaceWith(wrap);
-    wrap.append(tag, generateBtn);
+    wrap.append(generateBtn, tag);
 
     let timer = null;
     let seq = 0;
