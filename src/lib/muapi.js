@@ -67,6 +67,9 @@ export class MuapiClient {
             finalPayload.seed = params.seed;
         }
 
+        // Trained avatars / styles: [{ path, scale }] for LoRA-capable models
+        if (params.loras?.length) finalPayload.loras = params.loras;
+
         console.log('[Muapi] Requesting:', url);
         console.log('[Muapi] Payload:', finalPayload);
 

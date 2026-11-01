@@ -499,9 +499,24 @@ async function generate(params, mainWindow) {
         ? '--diffusion-model'
         : '-m';
 
+    // Trained avatar (LoRA): fetch it once into models/loras, then reference it from the prompt.
+    let prompt = params.prompt || '';
+    let loraDir = null;
+    if (params.lora?.url && params.lora?.name) {
+        const loraName = String(params.lora.name).replace(/[^a-zA-Z0-9_-]/g, '');
+        loraDir = path.join(MODELS_DIR, 'loras');
+        fs.mkdirSync(loraDir, { recursive: true });
+        const loraPath = path.join(loraDir, `${loraName}.safetensors`);
+        if (!fs.existsSync(loraPath)) {
+            send({ status: 'downloading', progress: 0, message: 'Downloading avatar…' });
+            await downloadFile(params.lora.url, loraPath, (p) => send({ status: 'downloading', progress: p, message: 'Downloading avatar…' }));
+        }
+        prompt = `${prompt} <lora:${loraName}:${Number(params.lora.scale) || 1}>`;
+    }
+
     const args = [
         modelFlag, modelPath,
-        '-p', params.prompt || '',
+        '-p', prompt,
         '-o', outPath,
         '--steps', String(steps),
         '-H', String(height),
@@ -515,6 +530,7 @@ async function generate(params, mainWindow) {
     if (params.negative_prompt) {
         args.push('-n', params.negative_prompt);
     }
+    if (loraDir) args.push('--lora-model-dir', loraDir);
 
     // Not enough VRAM but enough RAM: keep weights in RAM and stream them to the GPU.
     if (memoryPlan.offload) {

@@ -14,6 +14,8 @@ import { addViewerClose } from './viewerClose.js';
 import { showErrorBanner } from './ErrorBanner.js';
 import { placePopover } from '../lib/placePopover.js';
 import { ratioGrid } from '../lib/ratioGrid.js';
+import { activeAvatar, avatarPrompt, getAvatars, setActiveAvatar, getActiveAvatarId, resumeTrainings, AVATAR_CHANGE_EVENT, LORA_ENDPOINT } from '../lib/avatars.js';
+import { AvatarManager } from './AvatarManager.js';
 import { activeLook, applyLook, BRAND_CHANGE_EVENT } from '../lib/brands.js';
 import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
@@ -46,7 +48,15 @@ export function ImageStudio() {
         try { localStorage.setItem(LAST_KEY, JSON.stringify(last)); } catch { /* storage full */ }
     };
     const editModelFor = (t2iId) => getI2IModelById(`${t2iId}-edit`) || getI2IModelById(t2iId.replace('-text-to-image', '-image-to-image'));
-    const pickAr = (list) => (list.includes(last.ar) ? last.ar : list[0]);
+    const ratioValue = (r) => { const [w, h] = String(r).split(':').map(Number); return w > 0 && h > 0 ? w / h : NaN; };
+    // Last used ratio if this model has it, else the closest one it has (4:5 -> 3:4), else the first.
+    const pickAr = (list) => {
+        if (list.includes(last.ar)) return last.ar;
+        const want = ratioValue(last.ar);
+        const near = list.filter((r) => !Number.isNaN(ratioValue(r)))
+            .sort((a, b) => Math.abs(ratioValue(a) - want) - Math.abs(ratioValue(b) - want))[0];
+        return (Number.isNaN(want) ? null : near) || list[0];
+    };
     const pickQuality = (list) => (list.includes(last.quality) ? last.quality : list[0]);
     const lastT2iModel = () => t2iModels.find(m => m.id === last.model) || t2iModels[0];
 
@@ -92,6 +102,7 @@ export function ImageStudio() {
     const declaresRatios = (id) => !!(imageMode ? getI2IModelById(id) : getModelById(id))?.inputs?.aspect_ratio?.enum;
     const getCurrentAspectRatios = (id) => {
         if (useLocalModel) return getLocalModelById(selectedLocalModel)?.aspectRatios || ['1:1'];
+        if (activeAvatar()) return getAspectRatiosForModel(LORA_ENDPOINT);
         if (!declaresRatios(id) && (imageMode ? getI2IModelById(id) : getModelById(id))) return COMMON_RATIOS;
         return imageMode ? getAspectRatiosForI2IModel(id) : getAspectRatiosForModel(id);
     };
@@ -254,6 +265,49 @@ export function ImageStudio() {
         controlsLeft.appendChild(localToggleBtn);
     }
 
+    // Trained avatar picker: "No avatar", ready avatars, and "Manage avatars…".
+    const avatarSelect = document.createElement('select');
+    avatarSelect.className = 'shrink-0 max-w-[11rem] px-3 md:px-4 py-2 md:py-2.5 rounded-xl md:rounded-2xl bg-white/5 hover:bg-white/10 text-xs font-bold text-white cursor-pointer outline-none appearance-none';
+    avatarSelect.title = t('avatar.pickerTitle');
+    avatarSelect.setAttribute('aria-label', t('avatar.pickerTitle'));
+    const fillAvatars = () => {
+        const activeId = getActiveAvatarId();
+        avatarSelect.replaceChildren(new Option(`👤 ${t('avatar.none')}`, ''));
+        for (const a of getAvatars()) {
+            const opt = new Option(a.status === 'ready' ? `👤 ${a.name}` : `👤 ${a.name} (${t(a.status === 'training' ? 'avatar.statusTraining' : 'avatar.statusFailed')})`, a.id, false, a.id === activeId);
+            opt.disabled = a.status !== 'ready';
+            avatarSelect.add(opt);
+        }
+        avatarSelect.add(new Option(`${t('avatar.manage')}…`, '__manage'));
+        avatarSelect.classList.toggle('!bg-primary/10', !!activeAvatar());
+        avatarSelect.classList.toggle('!text-primary', !!activeAvatar());
+    };
+    const syncAvatar = () => {
+        fillAvatars();
+        const ars = getCurrentAspectRatios(selectedModel);
+        if (!ars.includes(selectedAr)) {
+            selectedAr = pickAr(ars);
+            const arLabel = document.getElementById('ar-btn-label');
+            if (arLabel) arLabel.textContent = selectedAr;
+        }
+        if (!useLocalModel) {
+            const label = document.getElementById('model-btn-label');
+            if (label) label.textContent = activeAvatar() ? t('avatar.modelLabel') : selectedModelName;
+        }
+    };
+    avatarSelect.onchange = () => {
+        if (avatarSelect.value === '__manage') {
+            fillAvatars();
+            document.body.appendChild(AvatarManager());
+            return;
+        }
+        setActiveAvatar(avatarSelect.value || null);
+    };
+    window.addEventListener(AVATAR_CHANGE_EVENT, syncAvatar);
+    resumeTrainings();
+    fillAvatars();
+    setTimeout(syncAvatar, 0);
+    controlsLeft.appendChild(avatarSelect);
     controlsLeft.appendChild(modelBtn);
     controlsLeft.appendChild(arBtn);
     controlsLeft.appendChild(qualityBtn);
@@ -286,6 +340,8 @@ export function ImageStudio() {
     bottomRow.appendChild(generateBtn);
     attachPriceTag(generateBtn, () => {
         if (useLocalModel) return { local: true };
+        const av = activeAvatar();
+        if (av) return { endpoint: LORA_ENDPOINT, payload: { prompt: 'x', aspect_ratio: selectedAr, loras: [{ path: av.loraUrl, scale: 1 }] } };
         const info = imageMode ? getI2IModelById(selectedModel) : getModelById(selectedModel);
         if (!info) return null;
         const payload = { prompt: 'x', aspect_ratio: selectedAr };
@@ -1187,6 +1243,7 @@ export function ImageStudio() {
         if (useLocalModel) {
             const lm = getLocalModelById(selectedLocalModel);
             if (!lm) { alert(t('image.alertNoLocalModel')); return; }
+            if (activeAvatar() && lm.type !== 'z-image') { alert(t('avatar.localNeedsZImage')); return; }
 
             hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
             generateBtn.disabled = true;
@@ -1208,9 +1265,11 @@ export function ImageStudio() {
 
             let hadError = false;
             try {
+                const avatar = activeAvatar();
                 const res = await localAI.generate({
                     model: selectedLocalModel,
-                    prompt,
+                    prompt: avatar ? avatarPrompt(avatar, prompt) : prompt,
+                    ...(avatar ? { lora: { url: avatar.loraUrl, name: `avatar_${avatar.id}`, scale: 1 } } : {}),
                     negative_prompt: negativePrompt || undefined,
                     aspect_ratio: selectedAr,
                     steps: steps,
@@ -1270,7 +1329,20 @@ export function ImageStudio() {
         try {
             let res;
             const qualityLabel = document.getElementById('quality-btn-label')?.textContent;
-            if (imageMode) {
+            const avatar = activeAvatar();
+            if (avatar) {
+                // Trained avatar: the face comes from the LoRA, so references are not sent.
+                res = await muapi.generateImage({
+                    model: LORA_ENDPOINT,
+                    prompt: avatarPrompt(avatar, prompt),
+                    aspect_ratio: selectedAr,
+                    loras: [{ path: avatar.loraUrl, scale: 1 }],
+                    onRequestId: (rid) => {
+                        capturedRequestId = rid;
+                        savePendingJob({ requestId: rid, studioType: 'image', historyMeta, maxAttempts: 60, interval: 2000, submittedAt: Date.now() });
+                    }
+                });
+            } else if (imageMode) {
                 const images = [...uploadedImageUrls, ...brandRefs].slice(0, getMaxImagesForI2IModel(selectedModel) || undefined);
                 const genParams = {
                     model: selectedModel,
