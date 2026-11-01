@@ -374,7 +374,7 @@ export function VideoStudio() {
     bottomRow.className = 'flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 px-2 pt-4 border-t border-white/5';
 
     const controlsLeft = document.createElement('div');
-    controlsLeft.className = 'flex flex-wrap items-center gap-1.5 md:gap-2.5 relative min-w-0 flex-1';
+    controlsLeft.className = 'flex items-center gap-1.5 md:gap-2.5 relative overflow-x-auto no-scrollbar pb-1 md:pb-0 min-w-0';
 
     const createControlBtn = (icon, label, id, tooltip) => {
         const btn = document.createElement('button');

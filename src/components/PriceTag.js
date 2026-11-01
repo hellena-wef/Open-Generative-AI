@@ -1,14 +1,15 @@
 import { t } from '../lib/i18n.js';
 import { estimatePrice, formatUsd } from '../lib/pricing.js';
 
-// Shows what the next generation will cost, next to the generate button.
+// Shows what the next generation will cost as a small tag pinned to the generate
+// button's top edge, so it takes no room from the option pills.
 // getRequest() returns { local: true }, { endpoint, payload }, or null (nothing to price).
 export function attachPriceTag(generateBtn, getRequest) {
     const tag = document.createElement('span');
-    tag.className = 'font-mono text-[10px] uppercase tracking-[0.1em] text-white whitespace-nowrap leading-none empty:hidden';
+    tag.className = 'absolute -top-2.5 right-3 z-10 px-2 py-1 rounded-full bg-black border border-white/10 shadow-sm font-mono text-[10px] uppercase tracking-[0.08em] text-white whitespace-nowrap leading-none pointer-events-none empty:hidden';
     tag.title = t('price.tooltip');
     const wrap = document.createElement('div');
-    wrap.className = 'flex flex-col items-center gap-1.5 shrink-0';
+    wrap.className = 'relative shrink-0';
     generateBtn.replaceWith(wrap);
     wrap.append(generateBtn, tag);
 

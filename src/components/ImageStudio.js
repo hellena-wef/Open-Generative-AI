@@ -182,7 +182,7 @@ export function ImageStudio() {
     bottomRow.className = 'flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 px-2 pt-4 border-t border-white/5';
 
     const controlsLeft = document.createElement('div');
-    controlsLeft.className = 'flex flex-wrap items-center gap-1.5 md:gap-2.5 relative min-w-0 flex-1';
+    controlsLeft.className = 'flex items-center gap-1.5 md:gap-2.5 relative overflow-x-auto no-scrollbar pb-1 md:pb-0 min-w-0';
 
     const createControlBtn = (icon, label, id, tooltip) => {
         const btn = document.createElement('button');
@@ -285,7 +285,7 @@ export function ImageStudio() {
     });
     // Active brand label in the bar; switching brand applies its default aspect ratio.
     const brandChip = document.createElement('span');
-    brandChip.className = 'font-mono text-[10px] uppercase tracking-[0.12em] text-primary whitespace-nowrap self-center empty:hidden';
+    brandChip.className = 'absolute -top-2.5 left-6 z-10 px-2 py-1 rounded-full bg-black border border-primary/30 shadow-sm font-mono text-[10px] uppercase tracking-[0.08em] text-primary whitespace-nowrap leading-none pointer-events-none empty:hidden';
     const syncBrand = (applyDefaults) => {
         if (!brandChip.isConnected && applyDefaults) return window.removeEventListener(BRAND_CHANGE_EVENT, onBrandChange);
         const look = activeLook();
@@ -298,7 +298,8 @@ export function ImageStudio() {
         }
     };
     const onBrandChange = () => syncBrand(true);
-    controlsLeft.prepend(brandChip);
+    bar.classList.add('relative');
+    bar.appendChild(brandChip);
     window.addEventListener(BRAND_CHANGE_EVENT, onBrandChange);
     syncBrand(false);
     bar.appendChild(bottomRow);
