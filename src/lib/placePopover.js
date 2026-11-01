@@ -16,7 +16,8 @@ export function placePopover(popover, anchor, container, { center = false } = {}
     const openUp = needed <= spaceAbove || (needed > spaceBelow && spaceAbove >= spaceBelow);
 
     popover.style.maxHeight = `${Math.max(160, openUp ? spaceAbove : spaceBelow)}px`;
-    popover.style.overflowY = 'auto';
+    // A popover with its own scrolling list (e.g. the model picker) keeps one scrollbar.
+    popover.style.overflowY = popover.querySelector('.overflow-y-auto') ? 'hidden' : 'auto';
     if (center) {
         popover.style.left = '50%';
         popover.style.transform = 'translateX(-50%)';

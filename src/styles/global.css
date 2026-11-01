@@ -23,7 +23,7 @@
 
 @layer components {
     .glass {
-        @apply bg-black/80 backdrop-blur-2xl border border-white/10 shadow-3xl;
+        @apply bg-black/[0.97] backdrop-blur-2xl border border-white/10 shadow-3xl;
     }
 
     .glass-panel {
