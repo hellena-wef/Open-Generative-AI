@@ -445,14 +445,11 @@ async function deleteModel(modelId) {
 // ─── Generation ───────────────────────────────────────────────────────────────
 function arToDimensions(ar, modelType) {
     const base = (modelType === 'sdxl' || modelType === 'z-image') ? 1024 : 512;
-    const map = {
-        '1:1': [base, base],
-        '16:9': [Math.round(base * 16 / 9 / 64) * 64, base],
-        '9:16': [base, Math.round(base * 16 / 9 / 64) * 64],
-        '4:3': [Math.round(base * 4 / 3 / 64) * 64, base],
-        '3:4': [base, Math.round(base * 4 / 3 / 64) * 64],
-    };
-    return map[ar] || [base, base];
+    const [w, h] = String(ar).split(':').map(Number);
+    if (!(w > 0 && h > 0) || w === h) return [base, base];
+    // Short side stays at the model's native size; the long side is rounded to 64.
+    const long = Math.round((base * Math.max(w, h)) / Math.min(w, h) / 64) * 64;
+    return w > h ? [long, base] : [base, long];
 }
 
 async function generate(params, mainWindow) {
@@ -648,5 +645,6 @@ function register() {
 }
 
 module.exports = {
+    arToDimensions,
     register,
 };

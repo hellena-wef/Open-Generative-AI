@@ -13,6 +13,7 @@ import { createUploadPicker } from './UploadPicker.js';
 import { addViewerClose } from './viewerClose.js';
 import { showErrorBanner } from './ErrorBanner.js';
 import { placePopover } from '../lib/placePopover.js';
+import { ratioGrid } from '../lib/ratioGrid.js';
 import { activeLook, applyLook, BRAND_CHANGE_EVENT } from '../lib/brands.js';
 import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
@@ -85,7 +86,15 @@ export function ImageStudio() {
     let showToolsPanel = false;
 
     const getCurrentModels = () => imageMode ? i2iModels : t2iModels;
-    const getCurrentAspectRatios = (id) => imageMode ? getAspectRatiosForI2IModel(id) : getAspectRatiosForModel(id);
+    // Models that don't declare their ratios get the shared fallback list, which in the
+    // studio package is only 1:1/16:9/9:16 for edit models; offer the full common set instead.
+    const COMMON_RATIOS = ['1:1', '4:5', '3:4', '2:3', '9:16', '16:9', '4:3', '3:2', '21:9'];
+    const declaresRatios = (id) => !!(imageMode ? getI2IModelById(id) : getModelById(id))?.inputs?.aspect_ratio?.enum;
+    const getCurrentAspectRatios = (id) => {
+        if (useLocalModel) return getLocalModelById(selectedLocalModel)?.aspectRatios || ['1:1'];
+        if (!declaresRatios(id) && (imageMode ? getI2IModelById(id) : getModelById(id))) return COMMON_RATIOS;
+        return imageMode ? getAspectRatiosForI2IModel(id) : getAspectRatiosForModel(id);
+    };
     const getCurrentResolutions = (id) => imageMode ? getResolutionsForI2IModel(id) : getResolutionsForModel(id);
     const getCurrentQualityField = (id) => imageMode ? getQualityFieldForI2IModel(id) : getQualityFieldForModel(id);
 
@@ -133,9 +142,11 @@ export function ImageStudio() {
             uploadedImageUrls = urls || [url];
             if (!imageMode) {
                 imageMode = true;
-                selectedModel = i2iModels[0].id;
-                selectedModelName = i2iModels[0].name;
-                selectedAr = pickAr(getAspectRatiosForI2IModel(selectedModel));
+                // Keep the user's model family (Nano Banana -> Nano Banana Edit) when it has an edit sibling.
+                const editModel = (!useLocalModel && editModelFor(selectedModel)) || i2iModels[0];
+                selectedModel = editModel.id;
+                selectedModelName = editModel.name;
+                selectedAr = pickAr(getCurrentAspectRatios(selectedModel));
                 document.getElementById('model-btn-label').textContent = selectedModelName;
                 document.getElementById('ar-btn-label').textContent = selectedAr;
                 const validResolutions = getResolutionsForI2IModel(selectedModel);
@@ -152,7 +163,7 @@ export function ImageStudio() {
             imageMode = false;
             selectedModel = lastT2iModel().id;
             selectedModelName = lastT2iModel().name;
-            selectedAr = pickAr(getAspectRatiosForModel(selectedModel));
+            selectedAr = pickAr(getCurrentAspectRatios(selectedModel));
             document.getElementById('model-btn-label').textContent = selectedModelName;
             document.getElementById('ar-btn-label').textContent = selectedAr;
             const t2iResolutions = getResolutionsForModel(selectedModel);
@@ -806,7 +817,7 @@ export function ImageStudio() {
                                     <span class="text-[10px] text-muted">${m.type.toUpperCase()} · ${m.family}</span>
                                 </div>
                             </div>
-                            ${selectedLocalModel === m.id ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+                            ${selectedLocalModel === m.id ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E5251E" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
                         `;
                         item.onclick = (e) => {
                             e.stopPropagation();
@@ -835,7 +846,7 @@ export function ImageStudio() {
                                 <span class="text-xs font-bold text-white tracking-tight">${m.name}</span>
                              </div>
                         </div>
-                        ${selectedModel === m.id ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+                        ${selectedModel === m.id ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E5251E" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
                     `;
                     item.onclick = (e) => {
                         e.stopPropagation();
@@ -870,34 +881,14 @@ export function ImageStudio() {
             searchInput.oninput = (e) => renderModels(e.target.value);
 
         } else if (type === 'ar') {
-            dropdown.classList.add('max-w-[240px]');
+            dropdown.classList.add('max-w-[320px]');
             dropdown.innerHTML = `<div class="text-[10px] font-bold text-muted uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">${t('common.aspectRatio')}</div>`;
-            const list = document.createElement('div');
-            list.className = 'flex flex-col gap-1';
-
-            const availableArs = getCurrentAspectRatios(selectedModel);
-            availableArs.forEach(r => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
-                item.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="w-6 h-6 border-2 border-white/20 rounded-md shadow-inner flex items-center justify-center group-hover:border-primary/50 transition-colors">
-                             <div class="w-3 h-3 bg-white/10 rounded-sm"></div>
-                        </div>
-                        <span class="text-xs font-bold text-white opacity-80 group-hover:opacity-100 transition-opacity">${r}</span>
-                    </div>
-                     ${selectedAr === r ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
-                `;
-                item.onclick = (e) => {
-                    e.stopPropagation();
-                    selectedAr = r;
-                    rememberLast({ ar: r });
-                    document.getElementById('ar-btn-label').textContent = r;
-                    closeDropdown();
-                };
-                list.appendChild(item);
-            });
-            dropdown.appendChild(list);
+            dropdown.appendChild(ratioGrid(getCurrentAspectRatios(selectedModel), selectedAr, (r) => {
+                selectedAr = r;
+                rememberLast({ ar: r });
+                document.getElementById('ar-btn-label').textContent = r;
+                closeDropdown();
+            }));
         } else if (type === 'quality') {
             dropdown.classList.add('max-w-[200px]');
             dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">${t('common.resolution')}</div>`;
@@ -911,7 +902,7 @@ export function ImageStudio() {
                 item.className = 'flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
                 item.innerHTML = `
                     <span class="text-xs font-bold text-white opacity-80 group-hover:opacity-100">${opt}</span>
-                     ${document.getElementById('quality-btn-label').textContent === opt ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+                     ${document.getElementById('quality-btn-label').textContent === opt ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E5251E" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
                 `;
                 item.onclick = (e) => {
                     e.stopPropagation();
@@ -1161,7 +1152,7 @@ export function ImageStudio() {
         imageMode = false;
         selectedModel = lastT2iModel().id;
         selectedModelName = lastT2iModel().name;
-        selectedAr = pickAr(getAspectRatiosForModel(selectedModel));
+        selectedAr = pickAr(getCurrentAspectRatios(selectedModel));
         document.getElementById('model-btn-label').textContent = selectedModelName;
         document.getElementById('ar-btn-label').textContent = selectedAr;
         const resetResolutions = getResolutionsForModel(selectedModel);
