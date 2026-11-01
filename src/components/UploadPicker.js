@@ -57,7 +57,10 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
     thumbnailState.appendChild(thumbImg);
     thumbnailState.appendChild(countBadge);
 
-    trigger.appendChild(fileInput);
+    // The file input must not live inside the trigger <button>: its click bubbled back to
+    // the trigger (reopening the panel) and Chromium won't open a file chooser from inside
+    // a button. Keep it next to the panel instead.
+    anchorContainer.appendChild(fileInput);
     trigger.appendChild(iconState);
     trigger.appendChild(spinnerState);
     trigger.appendChild(thumbnailState);
