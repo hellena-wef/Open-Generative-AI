@@ -117,7 +117,7 @@ export function VideoStudio() {
     // 2. PROMPT BAR
     // ==========================================
     const promptWrapper = document.createElement('div');
-    promptWrapper.className = 'w-full max-w-4xl relative z-40 animate-fade-in-up';
+    promptWrapper.className = 'w-full max-w-6xl relative z-40 animate-fade-in-up';
     promptWrapper.style.animationDelay = '0.2s';
 
     const bar = document.createElement('div');
@@ -375,7 +375,7 @@ export function VideoStudio() {
     bottomRow.className = 'flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 px-2 pt-4 border-t border-white/5';
 
     const controlsLeft = document.createElement('div');
-    controlsLeft.className = 'flex items-center gap-1.5 md:gap-2.5 relative overflow-x-auto no-scrollbar pb-1 md:pb-0 min-w-0';
+    controlsLeft.className = 'flex items-center gap-1.5 md:gap-2.5 relative shrink-0';
 
     const createControlBtn = (icon, label, id, tooltip) => {
         const btn = document.createElement('button');
@@ -515,7 +515,7 @@ export function VideoStudio() {
     // Local generation progress + error panel (hidden until a local run starts)
     const localPanel = document.createElement('div');
     localPanel.id = 'v-local-panel';
-    localPanel.className = 'w-full max-w-4xl mt-4 hidden flex-col gap-2 relative z-30';
+    localPanel.className = 'w-full max-w-6xl mt-4 hidden flex-col gap-2 relative z-30';
     localPanel.innerHTML = `
         <div class="v-local-progress flex flex-col gap-2">
             <div class="flex items-center justify-between gap-3">

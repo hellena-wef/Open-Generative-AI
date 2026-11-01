@@ -19,6 +19,7 @@ export default {
         'common.generate': '生成 ✨',
         'common.close': '閉じる',
         'price.free': '無料 · このパソコンで実行',
+        'price.freeShort': '無料',
         'price.tooltip': '生成前に MuAPI が見積もった料金です',
         'common.generating': '生成中...',
         'common.download': '↓ ダウンロード',

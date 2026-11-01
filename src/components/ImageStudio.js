@@ -114,7 +114,7 @@ export function ImageStudio() {
     // 2. PROMPT BAR (Tailwind Refactor)
     // ==========================================
     const promptWrapper = document.createElement('div');
-    promptWrapper.className = 'w-full max-w-4xl relative z-40 animate-fade-in-up';
+    promptWrapper.className = 'w-full max-w-6xl relative z-40 animate-fade-in-up';
     promptWrapper.style.animationDelay = '0.2s';
 
     const bar = document.createElement('div');
@@ -183,7 +183,7 @@ export function ImageStudio() {
     bottomRow.className = 'flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 px-2 pt-4 border-t border-white/5';
 
     const controlsLeft = document.createElement('div');
-    controlsLeft.className = 'flex items-center gap-1.5 md:gap-2.5 relative overflow-x-auto no-scrollbar pb-1 md:pb-0 min-w-0';
+    controlsLeft.className = 'flex items-center gap-1.5 md:gap-2.5 relative shrink-0';
 
     const createControlBtn = (icon, label, id, tooltip) => {
         const btn = document.createElement('button');
@@ -308,12 +308,12 @@ export function ImageStudio() {
     container.appendChild(promptWrapper);
 
     const inlineInstructions = createInlineInstructions('image');
-    inlineInstructions.classList.add('max-w-4xl', 'mt-8');
+    inlineInstructions.classList.add('max-w-6xl', 'mt-8');
     container.appendChild(inlineInstructions);
 
     // Local generation progress bar (hidden until active)
     const localProgressWrap = document.createElement('div');
-    localProgressWrap.className = 'w-full max-w-4xl mt-4 hidden flex-col gap-2';
+    localProgressWrap.className = 'w-full max-w-6xl mt-4 hidden flex-col gap-2';
     localProgressWrap.id = 'local-progress-wrap';
     localProgressWrap.innerHTML = `
         <div class="flex items-center justify-between">
@@ -341,7 +341,7 @@ export function ImageStudio() {
     // 3. QUICK TOOLS PANEL (Prompt Enhancer + Quick Starters)
     // ==========================================
     const toolsPanel = document.createElement('div');
-    toolsPanel.className = 'w-full max-w-4xl mt-6 animate-fade-in-up hidden';
+    toolsPanel.className = 'w-full max-w-6xl mt-6 animate-fade-in-up hidden';
     toolsPanel.id = 'tools-panel';
     
     // Build tools panel HTML
@@ -415,7 +415,7 @@ export function ImageStudio() {
     };
     
     const advancedPanel = document.createElement('div');
-    advancedPanel.className = 'w-full max-w-4xl mt-6 animate-fade-in-up hidden';
+    advancedPanel.className = 'w-full max-w-6xl mt-6 animate-fade-in-up hidden';
     advancedPanel.id = 'advanced-panel';
     advancedPanel.innerHTML = `
         <div class="bg-card-bg/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
