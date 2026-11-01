@@ -5,6 +5,7 @@ import { t, tf } from '../lib/i18n.js';
 import { studioHeroHTML } from './studioHero.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { addViewerClose } from './viewerClose.js';
+import { showErrorBanner } from './ErrorBanner.js';
 import { placePopover } from '../lib/placePopover.js';
 import { activeLook, applyLook } from '../lib/brands.js';
 import { attachPriceTag } from './PriceTag.js';
@@ -1437,12 +1438,8 @@ export function VideoStudio() {
                 if (cancelled) hideLocalPanel();
                 else showLocalError(e.message);
             }
-            generateBtn.innerHTML = cancelled ? t('video.localCancelled')
-                : isLocal ? t('video.localFailed')
-                : tf('common.error', e.message.slice(0, 60));
-            setTimeout(() => {
-                generateBtn.innerHTML = t('common.generate');
-            }, 4000);
+            if (!cancelled) showErrorBanner(e);
+            generateBtn.innerHTML = t('common.generate');
         } finally {
             generateBtn.disabled = false;
             if (typeof unsubscribeProgress === 'function') unsubscribeProgress();

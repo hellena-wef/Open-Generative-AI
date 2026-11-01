@@ -5,6 +5,7 @@ import { t, tf } from '../lib/i18n.js';
 import { studioHeroHTML } from './studioHero.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { addViewerClose } from './viewerClose.js';
+import { showErrorBanner } from './ErrorBanner.js';
 import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 
@@ -712,8 +713,8 @@ export function LipSyncStudio() {
             if (capturedRequestId) removePendingJob(capturedRequestId);
             console.error(e);
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
-            generateBtn.innerHTML = tf('common.error', e.message.slice(0, 60));
-            setTimeout(() => { generateBtn.innerHTML = t('common.generate'); }, 4000);
+            showErrorBanner(e);
+            generateBtn.innerHTML = t('common.generate');
         } finally {
             generateBtn.disabled = false;
             if (!hadError) generateBtn.innerHTML = t('common.generate');

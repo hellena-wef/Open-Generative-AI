@@ -8,6 +8,26 @@ let contentArea;
 // Keep all mounted page nodes so async generation survives tab switches
 const mountedPages = {};
 
+// A tab is loaded on first visit. If its code can't be loaded (usually because the app
+// was rebuilt while this window was open and the old file names are gone), reload once
+// to pick up the new build instead of leaving a blank tab.
+function mountLazy(wrapper, load, exportName) {
+  load()
+    .then((mod) => {
+      sessionStorage.removeItem('faisca_chunk_reload');
+      wrapper.appendChild(mod[exportName]());
+    })
+    .catch((err) => {
+      console.error('[navigate] failed to load', exportName, err);
+      if (!sessionStorage.getItem('faisca_chunk_reload')) {
+        sessionStorage.setItem('faisca_chunk_reload', '1');
+        location.reload();
+        return;
+      }
+      wrapper.innerHTML = `<div class="m-auto max-w-md text-center text-secondary text-sm p-8">${err.message}</div>`;
+    });
+}
+
 // Router — show/hide instead of destroy
 function navigate(page) {
   if (!contentArea) return;
@@ -28,29 +48,17 @@ function navigate(page) {
     if (page === 'image') {
       wrapper.appendChild(ImageStudio());
     } else if (page === 'video') {
-      import('./components/VideoStudio.js').then(({ VideoStudio }) => {
-        wrapper.appendChild(VideoStudio());
-      });
+      mountLazy(wrapper, () => import('./components/VideoStudio.js'), 'VideoStudio');
     } else if (page === 'cinema') {
-      import('./components/CinemaStudio.js').then(({ CinemaStudio }) => {
-        wrapper.appendChild(CinemaStudio());
-      });
+      mountLazy(wrapper, () => import('./components/CinemaStudio.js'), 'CinemaStudio');
     } else if (page === 'lipsync') {
-      import('./components/LipSyncStudio.js').then(({ LipSyncStudio }) => {
-        wrapper.appendChild(LipSyncStudio());
-      });
+      mountLazy(wrapper, () => import('./components/LipSyncStudio.js'), 'LipSyncStudio');
     } else if (page === 'workflows') {
-      import('./components/WorkflowStudio.js').then(({ WorkflowStudio }) => {
-        wrapper.appendChild(WorkflowStudio());
-      });
+      mountLazy(wrapper, () => import('./components/WorkflowStudio.js'), 'WorkflowStudio');
     } else if (page === 'agents') {
-      import('./components/AgentStudio.js').then(({ AgentStudio }) => {
-        wrapper.appendChild(AgentStudio());
-      });
+      mountLazy(wrapper, () => import('./components/AgentStudio.js'), 'AgentStudio');
     } else if (page === 'mcp-cli') {
-      import('./components/McpCliStudio.js').then(({ McpCliStudio }) => {
-        wrapper.appendChild(McpCliStudio());
-      });
+      mountLazy(wrapper, () => import('./components/McpCliStudio.js'), 'McpCliStudio');
     }
   }
 }

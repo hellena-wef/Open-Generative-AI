@@ -28,7 +28,7 @@ const LOCAL_MODEL_CATALOG = [
         description: 'WaveSpeed\'s featured local model — ultra-fast 8-step generation. No API key needed. Requires text encoder + VAE (~2.7 GB extra).',
         type: 'z-image',
         filename: 'z_image_turbo-Q4_K.gguf',
-        sizeGB: 2.5,
+        sizeGB: 3.9,
         downloadUrl: 'https://huggingface.co/leejet/Z-Image-Turbo-GGUF/resolve/main/z_image_turbo-Q4_K.gguf',
         aspectRatios: ['1:1', '4:3', '3:4', '16:9', '9:16'],
         defaultWidth: 1024,

@@ -11,6 +11,7 @@ import { AuthModal } from './AuthModal.js';
 import { t, tf } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { addViewerClose } from './viewerClose.js';
+import { showErrorBanner } from './ErrorBanner.js';
 import { placePopover } from '../lib/placePopover.js';
 import { activeLook, applyLook, BRAND_CHANGE_EVENT } from '../lib/brands.js';
 import { attachPriceTag } from './PriceTag.js';
@@ -1250,8 +1251,8 @@ export function ImageStudio() {
                 console.error('[Local] generation error:', e);
                 hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
                 console.error('[Local] full error:', e.message);
-                generateBtn.innerHTML = tf('common.error', e.message.slice(0, 120));
-                setTimeout(() => { generateBtn.innerHTML = t('common.generate'); }, 6000);
+                showErrorBanner(e);
+                generateBtn.innerHTML = t('common.generate');
             } finally {
                 generateBtn.disabled = false;
                 if (!hadError) generateBtn.innerHTML = t('common.generate');
@@ -1351,10 +1352,8 @@ export function ImageStudio() {
             // Restore hero so the page doesn't look broken after a failed generation
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
             const errorMessage = appendGenerationRefundNotice(e.message, e);
-            generateBtn.textContent = tf('common.error', errorMessage.slice(0, 100));
-            setTimeout(() => {
-                generateBtn.innerHTML = t('common.generate');
-            }, 4000);
+            showErrorBanner(new Error(errorMessage));
+            generateBtn.innerHTML = t('common.generate');
         } finally {
             generateBtn.disabled = false;
             // Only reset the label on success; the catch timeout handles the error case
