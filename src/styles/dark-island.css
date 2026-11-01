@@ -1,2 +1,15 @@
 @config "./dark-island.tailwind.config.js";
 @tailwind utilities;
+
+/* Arbitrary dark hex classes used by the shared studios, mapped to the Faísca palette.
+   Same specificity as the generated .dark-island utilities and declared after them. */
+.dark-island .bg-\[\#030303\], .dark-island .bg-\[\#050505\], .dark-island .bg-\[\#0a0a0a\],
+.dark-island .bg-\[\#0B0F17\], .dark-island .bg-\[\#0c0d0f\] { background-color: #FCFCFA !important; }
+.dark-island .bg-\[\#151618\], .dark-island .bg-\[\#1a1b1e\], .dark-island .bg-\[\#1A1F2B\],
+.dark-island .bg-\[\#1b1e23\], .dark-island .bg-\[\#1c1e21\] { background-color: #F1F1EE !important; }
+.dark-island .bg-\[\#212326\], .dark-island .bg-\[\#242629\], .dark-island .bg-\[\#2c3037\] { background-color: #E4E1D8 !important; }
+.dark-island .from-\[\#151618\], .dark-island .from-\[\#121418\] { --tw-gradient-from: #F6F6F3 var(--tw-gradient-from-position) !important; --tw-gradient-to: rgb(246 246 243 / 0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+.dark-island .to-\[\#1c1e21\], .dark-island .to-\[\#08090a\] { --tw-gradient-to: #EFEDE6 var(--tw-gradient-to-position) !important; }
+.dark-island .bg-\[\#22d3ee\] { background-color: #E5251E !important; }
+.dark-island .text-\[\#22d3ee\] { color: #E5251E !important; }
+.dark-island .border-\[\#22d3ee\] { border-color: #E5251E !important; }
