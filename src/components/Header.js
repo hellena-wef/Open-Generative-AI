@@ -27,7 +27,7 @@ export function Header(navigate) {
     `;
 
     const menu = document.createElement('nav');
-    menu.className = 'hidden lg:flex items-center gap-6 font-mono text-[11px] uppercase tracking-[0.12em] text-secondary';
+    menu.className = 'hidden lg:flex items-center gap-4 xl:gap-6 whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.12em] text-secondary';
     const items = [
         { label: t('nav.image'),   page: 'image' },
         { label: t('nav.video'),   page: 'video' },
@@ -89,7 +89,7 @@ export function Header(navigate) {
 
     // Brand / project picker: the active look is applied to every generation.
     const brandSelect = document.createElement('select');
-    brandSelect.className = 'max-w-[16rem] px-2 py-1.5 rounded-md border border-primary/30 bg-primary/5 text-[13px] font-medium text-white hover:border-primary/60 transition-colors cursor-pointer outline-none';
+    brandSelect.className = 'max-w-[12rem] xl:max-w-[16rem] px-2 py-1.5 rounded-md border border-primary/30 bg-primary/5 text-[13px] font-medium text-white hover:border-primary/60 transition-colors cursor-pointer outline-none';
     brandSelect.title = t('brand.pickerTitle');
     brandSelect.setAttribute('aria-label', t('brand.pickerTitle'));
     const fillBrands = () => {

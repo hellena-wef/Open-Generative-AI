@@ -11,6 +11,7 @@ import { AuthModal } from './AuthModal.js';
 import { t, tf } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { addViewerClose } from './viewerClose.js';
+import { placePopover } from '../lib/placePopover.js';
 import { activeLook, applyLook, BRAND_CHANGE_EVENT } from '../lib/brands.js';
 import { attachPriceTag } from './PriceTag.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
@@ -181,12 +182,12 @@ export function ImageStudio() {
     bottomRow.className = 'flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 px-2 pt-4 border-t border-white/5';
 
     const controlsLeft = document.createElement('div');
-    controlsLeft.className = 'flex items-center gap-1.5 md:gap-2.5 relative overflow-x-auto no-scrollbar pb-1 md:pb-0';
+    controlsLeft.className = 'flex flex-wrap items-center gap-1.5 md:gap-2.5 relative min-w-0 flex-1';
 
     const createControlBtn = (icon, label, id, tooltip) => {
         const btn = document.createElement('button');
         btn.id = id;
-        btn.className = 'flex items-center gap-1.5 md:gap-2.5 px-3 md:px-4 py-2 md:py-2.5 bg-white/5 hover:bg-white/10 rounded-xl md:rounded-2xl transition-all border border-white/5 group whitespace-nowrap';
+        btn.className = 'flex items-center gap-1.5 md:gap-2.5 px-3 md:px-4 py-2 md:py-2.5 bg-white/5 hover:bg-white/10 rounded-xl md:rounded-2xl transition-colors border border-transparent group whitespace-nowrap';
         if (tooltip) btn.setAttribute('data-tooltip', tooltip);
         btn.innerHTML = `
             ${icon}
@@ -752,7 +753,7 @@ export function ImageStudio() {
     // 3. DROPDOWNS (Professional implementation)
     // ==========================================
     const dropdown = document.createElement('div');
-    dropdown.className = 'absolute bottom-[102%] left-2 z-50 transition-all opacity-0 pointer-events-none scale-95 origin-bottom-left glass rounded-3xl p-3 translate-y-2 w-[calc(100vw-3rem)] max-w-xs shadow-4xl border border-white/10 flex flex-col';
+    dropdown.className = 'absolute left-2 z-50 transition-all opacity-0 pointer-events-none scale-95 origin-bottom-left glass rounded-3xl p-3 translate-y-2 w-[calc(100vw-3rem)] max-w-xs shadow-4xl border border-white/10 flex flex-col';
 
     const showDropdown = (type, anchorBtn) => {
         dropdown.innerHTML = '';
@@ -921,23 +922,7 @@ export function ImageStudio() {
             dropdown.appendChild(list);
         }
 
-        // Position dropdown
-        const btnRect = anchorBtn.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-
-        // Horizontal position
-        if (window.innerWidth < 768) {
-            // Center on mobile
-            dropdown.style.left = '50%';
-            dropdown.style.transform = 'translateX(-50%) translate(0, 8px)';
-        } else {
-            // Align with button on desktop
-            dropdown.style.left = `${btnRect.left - containerRect.left}px`;
-            dropdown.style.transform = 'translate(0, 8px)';
-        }
-
-        // Vertical position (always above button)
-        dropdown.style.bottom = `${containerRect.bottom - btnRect.top + 8}px`;
+        placePopover(dropdown, anchorBtn, container, { center: window.innerWidth < 768 });
     };
 
     const closeDropdown = () => {

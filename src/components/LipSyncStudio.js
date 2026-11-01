@@ -367,7 +367,7 @@ export function LipSyncStudio() {
         const ddHeight = dropdown.offsetHeight;
         const rect = anchorBtn.getBoundingClientRect();
         const spaceBelow = window.innerHeight - rect.bottom - 8;
-        const spaceAbove = rect.top - 8;
+        const spaceAbove = rect.top - (document.querySelector('header')?.getBoundingClientRect().bottom || 0) - 16;
 
         if (spaceBelow >= ddHeight || spaceBelow >= spaceAbove) {
             dropdown.style.top = `${rect.bottom + 8}px`;
