@@ -1,6 +1,9 @@
 import './style.css';
 import { Header } from './components/Header.js';
 import { ImageStudio } from './components/ImageStudio.js';
+import { showNotice } from './components/ErrorBanner.js';
+
+window.alert = showNotice;
 
 const app = document.querySelector('#app');
 let contentArea;

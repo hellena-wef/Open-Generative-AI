@@ -2,8 +2,10 @@ import { t } from '../lib/i18n.js';
 import { explainError } from '../lib/explainError.js';
 
 // A banner under the header that explains a failed generation and stays until closed.
-export function showErrorBanner(err) {
-    const { key, details } = explainError(err);
+export function showErrorBanner(err, { notice = false } = {}) {
+    const explained = explainError(err);
+    const key = notice ? 'notice' : explained.key;
+    const details = notice ? '' : explained.details;
     document.getElementById('faisca-error-banner')?.remove();
 
     const banner = document.createElement('div');
@@ -11,7 +13,7 @@ export function showErrorBanner(err) {
     banner.setAttribute('role', 'alert');
     banner.className = 'fixed top-20 left-1/2 -translate-x-1/2 z-[150] w-[min(92vw,36rem)] bg-black border border-primary/40 rounded-2xl shadow-3xl p-4 pr-12';
     banner.innerHTML = `
-        <p class="font-mono text-[10px] uppercase tracking-[0.12em] text-primary mb-1">${t('error.label')}</p>
+        <p class="font-mono text-[10px] uppercase tracking-[0.12em] text-primary mb-1">${notice ? t('error.noticeLabel') : t('error.label')}</p>
         <p class="text-sm font-medium text-white mb-1"></p>
         <p class="text-sm text-secondary"></p>
         <details class="mt-3 text-xs text-secondary">
@@ -23,11 +25,21 @@ export function showErrorBanner(err) {
         </button>
     `;
     const [, title, fix] = banner.querySelectorAll('p');
-    title.textContent = t(`error.${key}.title`);
-    fix.textContent = t(`error.${key}.fix`);
+    title.textContent = notice ? String(err) : t(`error.${key}.title`);
+    fix.textContent = notice ? '' : t(`error.${key}.fix`);
+    if (!fix.textContent) fix.remove();
     banner.querySelector('pre').textContent = details || '—';
     if (!details) banner.querySelector('details').remove();
     banner.querySelector('button').onclick = () => banner.remove();
     document.body.appendChild(banner);
     return key;
+}
+
+// Replaces window.alert(): known errors get the explained banner, anything else
+// (e.g. "Enter a prompt first") a plain notice, both styled like the app instead of
+// a Windows dialog titled with the old app name.
+export function showNotice(message) {
+    const text = String(message ?? '');
+    if (explainError(text).key !== 'unknown') showErrorBanner(new Error(text));
+    else showErrorBanner(text, { notice: true });
 }

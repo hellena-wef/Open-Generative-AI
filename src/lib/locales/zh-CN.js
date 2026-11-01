@@ -374,6 +374,9 @@ export default {
 
         // Generation errors
         'error.label': '生成失败',
+        'error.noticeLabel': '提示',
+        'error.fileTooLarge.title': '图片太大，无法上传',
+        'error.fileTooLarge.fix': 'MuAPI 只接受 10 MB 以内的文件。应用现在会自动压缩大图；如果仍然出现，请导出更小的图片（如 JPEG）后重试。',
         'error.details': '技术详情',
         'error.noKey.title': '缺少 MuAPI 密钥',
         'error.noKey.fix': '在设置中添加密钥，或切换到本地，在这台电脑上生成。',

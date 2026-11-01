@@ -374,6 +374,9 @@ export default {
 
         // Generation errors
         'error.label': '生成に失敗しました',
+        'error.noticeLabel': 'お知らせ',
+        'error.fileTooLarge.title': '画像が大きすぎてアップロードできません',
+        'error.fileTooLarge.fix': 'MuAPI は 10MB までのファイルを受け付けます。大きな写真はアプリが自動で縮小します。それでも表示される場合は、小さく書き出して（JPEG など）再試行してください。',
         'error.details': '技術的な詳細',
         'error.noKey.title': 'MuAPI キーがありません',
         'error.noKey.fix': '設定でキーを追加するか、ローカルに切り替えてこのパソコンで生成してください。',

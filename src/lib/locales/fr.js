@@ -374,6 +374,9 @@ export default {
 
         // Generation errors
         'error.label': 'La génération a échoué',
+        'error.noticeLabel': 'Info',
+        'error.fileTooLarge.title': 'Image trop lourde à envoyer',
+        'error.fileTooLarge.fix': 'MuAPI accepte jusqu\'à 10 Mo. L\'app réduit désormais les grandes photos toute seule ; si ça persiste, exporte l\'image plus légère (ex. JPEG).',
         'error.details': 'Détails techniques',
         'error.noKey.title': 'Il manque la clé MuAPI',
         'error.noKey.fix': 'Ajoute ta clé dans Paramètres, ou passe en Local pour générer sur cet ordinateur.',

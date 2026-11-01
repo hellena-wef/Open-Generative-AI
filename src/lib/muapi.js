@@ -1,5 +1,6 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
 import { pollForGenerationResult } from '../../packages/studio/src/utils/generationLifecycle.js';
+import { shrinkImageForUpload } from './shrinkImage.js';
 
 export class MuapiClient {
     constructor() {
@@ -357,6 +358,7 @@ export class MuapiClient {
     async uploadFile(file) {
         const key = this.getKey();
         const url = `${this.baseUrl}/api/v1/upload_file`;
+        file = await shrinkImageForUpload(file);
 
         const formData = new FormData();
         formData.append('file', file);

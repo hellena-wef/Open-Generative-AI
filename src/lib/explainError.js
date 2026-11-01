@@ -3,6 +3,7 @@
 // kept as technical details. Order matters: the first matching rule wins.
 const RULES = [
     { key: 'noKey', test: /API Key missing/i },
+    { key: 'fileTooLarge', test: /UPLOAD_FILE_TOO_LARGE|exceeds \d+\s?MB|file too large|\b413\b/i },
     { key: 'keyInvalid', test: /\b(401|403)\b|invalid api key|unauthori[sz]ed/i },
     { key: 'noCredits', test: /\b402\b|insufficient (credit|balance|funds)|not enough credits/i },
     { key: 'rateLimit', test: /\b429\b|rate limit|too many requests/i },

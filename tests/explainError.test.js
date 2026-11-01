@@ -13,6 +13,7 @@ test('raw generation errors map to a plain-language explanation', async () => {
         ['API Request Failed: 402 Payment Required - insufficient balance', 'noCredits'],
         ['API Request Failed: 401 Unauthorized', 'keyInvalid'],
         ['API Key missing. Please set it in Settings.', 'noKey'],
+        ['Falha ao enviar a imagem: File upload failed: 400 - {"detail":{"error":{"code":"UPLOAD_FILE_TOO_LARGE","message":"Image file size exceeds 10MB limit."}}}', 'fileTooLarge'],
         ['something odd', 'unknown'],
     ];
     for (const [raw, key] of cases) assert.equal(explainError(new Error(raw)).key, key, raw);

@@ -374,6 +374,9 @@ export default {
 
         // Generation errors
         'error.label': '생성에 실패했어요',
+        'error.noticeLabel': '알림',
+        'error.fileTooLarge.title': '이미지가 너무 커서 올릴 수 없어요',
+        'error.fileTooLarge.fix': 'MuAPI는 10MB까지 받아요. 이제 앱이 큰 사진을 자동으로 줄여요. 그래도 나오면 이미지를 더 작게(JPEG 등) 내보내서 다시 시도하세요.',
         'error.details': '기술 정보',
         'error.noKey.title': 'MuAPI 키가 없어요',
         'error.noKey.fix': '설정에서 키를 추가하거나, 로컬로 바꿔서 이 컴퓨터에서 생성하세요.',

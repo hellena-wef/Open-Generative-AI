@@ -374,6 +374,9 @@ export default {
 
         // Generation errors
         'error.label': 'Erstellung fehlgeschlagen',
+        'error.noticeLabel': 'Hinweis',
+        'error.fileTooLarge.title': 'Bild zu groß zum Hochladen',
+        'error.fileTooLarge.fix': 'MuAPI nimmt Dateien bis 10 MB an. Die App verkleinert große Fotos jetzt automatisch; falls es weiter auftritt, exportiere das Bild kleiner (z. B. JPEG).',
         'error.details': 'Technische Details',
         'error.noKey.title': 'Kein MuAPI-Schlüssel',
         'error.noKey.fix': 'Trag deinen Schlüssel in den Einstellungen ein oder wechsle zu Lokal.',
