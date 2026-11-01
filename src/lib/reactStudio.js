@@ -3,6 +3,7 @@ import { createElement as h, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from '../shims/next-navigation.js';
 import { currentKey, installMuapiProxy } from './muapiProxy.js';
+import { translateTree } from './domTranslate.js';
 import '../styles/dark-island.css';
 
 function useApiKey() {
@@ -25,5 +26,6 @@ export function mountReactStudio(View, initialPath) {
         return h(RouterProvider, { initialPath }, h(View, { apiKey }));
     }
     createRoot(el).render(h(Root));
+    translateTree(el);
     return el;
 }
