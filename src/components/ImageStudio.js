@@ -10,6 +10,7 @@ import { ENHANCE_TAGS, QUICK_PROMPTS } from '../lib/promptUtils.js';
 import { AuthModal } from './AuthModal.js';
 import { t, tf } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
+import { shrinkImageForUpload, REF_SOFT_LIMIT_BYTES, REF_MAX_SIDE } from '../lib/shrinkImage.js';
 import { addViewerClose } from './viewerClose.js';
 import { showErrorBanner } from './ErrorBanner.js';
 import { placePopover } from '../lib/placePopover.js';
@@ -150,7 +151,9 @@ export function ImageStudio() {
     const picker = createUploadPicker({
         anchorContainer: container,
         maxImages: refMaxFor(selectedModel),
-        uploadFn: (file) => useLocalModel ? URL.createObjectURL(file) : muapi.uploadFile(file),
+        // Upscalers need the full-size original; every other model gets a lighter reference.
+        uploadFn: async (file) => useLocalModel ? URL.createObjectURL(file)
+            : muapi.uploadFile(/upscal/i.test(selectedModel) ? file : await shrinkImageForUpload(file, REF_SOFT_LIMIT_BYTES, REF_MAX_SIDE)),
         requireApiKey: () => !useLocalModel,
         onSelect: ({ url, urls }) => {
             uploadedImageUrls = urls || [url];

@@ -63,6 +63,7 @@ export default {
         'upload.countSelectedManage': (count, max) => `已选择 ${count}/${max} 张图像 — 点击管理`,
         'upload.oneSelectedAddMore': (max) => `已选择 1 张图像 — 点击添加更多（最多 ${max} 张）`,
         'upload.selectUpTo': (max) => `最多选择 ${max} 张图像`,
+        'upload.uploading': (n) => `正在上传 ${n} 张图像… 可能需要一分钟`,
         'upload.done': (count) => `✓ 完成（${count}）`,
         'upload.uploadFiles': '上传文件',
         'upload.uploadNew': '上传新图像',

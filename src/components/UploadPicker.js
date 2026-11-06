@@ -23,6 +23,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
     let panelOpen = false;
     let maxImages = initialMaxImages;
     let selectedEntries = []; // [{ url, thumbnail }, ...]
+    let uploadingCount = 0; // files still uploading, shown in the panel
 
     // ── Hidden file input ─────────────────────────────────────────────────────
     const fileInput = document.createElement('input');
@@ -210,6 +211,14 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
         header.appendChild(headerRight);
         panel.appendChild(header);
 
+        if (uploadingCount > 0) {
+            const status = document.createElement('div');
+            status.className = 'flex items-center gap-2 px-1 pb-3 text-xs text-primary font-bold';
+            status.innerHTML = `<span class="animate-spin">◌</span>`;
+            status.append(tf('upload.uploading', uploadingCount));
+            panel.appendChild(status);
+        }
+
         if (history.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'py-6 flex flex-col items-center gap-2 opacity-40';
@@ -371,6 +380,8 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
                 // Multi mode: upload all files (up to remaining slots)
                 const slots = maxImages - selectedEntries.length;
                 const toUpload = files.slice(0, Math.max(slots, 1));
+                uploadingCount = toUpload.length;
+                openPanel();
 
                 // Upload all in parallel
                 const results = await Promise.all(toUpload.map(async (file) => {
@@ -379,8 +390,11 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
                         generateThumbnail(file)
                     ]);
                     const uploadedUrl = typeof uploadResult === 'string' ? uploadResult : uploadResult?.url;
+                    uploadingCount = Math.max(0, uploadingCount - 1);
+                    if (panelOpen) renderPanel();
                     return { id: Date.now().toString() + Math.random(), name: file.name, uploadedUrl, thumbnail, timestamp: new Date().toISOString() };
                 }));
+                uploadingCount = 0;
 
                 results.forEach(entry => {
                     saveUpload(entry);
@@ -395,6 +409,8 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
             }
         } catch (err) {
             console.error('[UploadPicker] Upload failed:', err);
+            uploadingCount = 0;
+            if (panelOpen) renderPanel();
             updateTrigger();
             alert(tf('upload.imageUploadFailed', err.message));
         }

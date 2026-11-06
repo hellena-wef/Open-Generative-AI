@@ -63,6 +63,7 @@ export default {
         'upload.countSelectedManage': (count, max) => `${count} of ${max} images selected — click to manage`,
         'upload.oneSelectedAddMore': (max) => `1 image selected — click to add more (up to ${max})`,
         'upload.selectUpTo': (max) => `Select up to ${max} images`,
+        'upload.uploading': (n) => `Uploading ${n} image(s)… this can take a minute`,
         'upload.done': (count) => `✓ Done (${count})`,
         'upload.uploadFiles': 'Upload files',
         'upload.uploadNew': 'Upload new',

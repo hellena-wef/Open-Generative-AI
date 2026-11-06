@@ -63,6 +63,7 @@ export default {
         'upload.countSelectedManage': (count, max) => `이미지 ${max}개 중 ${count}개 선택됨 — 클릭해서 관리`,
         'upload.oneSelectedAddMore': (max) => `이미지 1개 선택됨 — 클릭해서 더 추가 (최대 ${max}개)`,
         'upload.selectUpTo': (max) => `이미지를 최대 ${max}개까지 선택할 수 있어요`,
+        'upload.uploading': (n) => `이미지 ${n}개 업로드 중… 1분 정도 걸릴 수 있어요`,
         'upload.done': (count) => `✓ 완료 (${count})`,
         'upload.uploadFiles': '파일 업로드',
         'upload.uploadNew': '새로 업로드',

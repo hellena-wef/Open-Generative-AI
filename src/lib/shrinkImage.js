@@ -4,12 +4,17 @@
 export const UPLOAD_LIMIT_BYTES = 9.5 * 1024 * 1024; // a little under 10 MB
 const MAX_SIDE = 4096; // larger than any model input; keeps the canvas manageable
 
-export async function shrinkImageForUpload(file, limit = UPLOAD_LIMIT_BYTES) {
+// Reference images: models read them at ~1-2k px, and a slow home uplink takes over a minute
+// per raw phone photo. Over REF_SOFT_LIMIT_BYTES they are resized to REF_MAX_SIDE first.
+export const REF_SOFT_LIMIT_BYTES = 1.5 * 1024 * 1024;
+export const REF_MAX_SIDE = 2048;
+
+export async function shrinkImageForUpload(file, limit = UPLOAD_LIMIT_BYTES, maxSide = MAX_SIDE) {
     if (!file?.type?.startsWith('image/') || file.size <= limit || file.type === 'image/gif') return file;
 
     const bitmap = await createImageBitmap(file);
     try {
-        let scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
+        let scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
         for (let attempt = 0; attempt < 6; attempt++) {
             const w = Math.round(bitmap.width * scale);
             const h = Math.round(bitmap.height * scale);

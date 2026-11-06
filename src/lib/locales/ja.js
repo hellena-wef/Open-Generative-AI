@@ -63,6 +63,7 @@ export default {
         'upload.countSelectedManage': (count, max) => `${max}枚中${count}枚を選択中 — クリックして管理`,
         'upload.oneSelectedAddMore': (max) => `1枚選択中 — クリックして追加（最大${max}枚）`,
         'upload.selectUpTo': (max) => `最大${max}枚まで選択できます`,
+        'upload.uploading': (n) => `${n}枚の画像をアップロード中… 1分ほどかかることがあります`,
         'upload.done': (count) => `✓ 完了 (${count})`,
         'upload.uploadFiles': 'ファイルをアップロード',
         'upload.uploadNew': '新規アップロード',
