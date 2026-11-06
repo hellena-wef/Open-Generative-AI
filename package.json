@@ -87,6 +87,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Faísca",
       "include": "build/installer.nsh"
     },
     "linux": {
