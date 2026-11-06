@@ -28,6 +28,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
+    fileInput.multiple = maxImages > 1;
     fileInput.className = 'hidden';
 
     // ── Trigger button ────────────────────────────────────────────────────────

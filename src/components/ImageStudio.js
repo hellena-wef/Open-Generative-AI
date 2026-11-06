@@ -48,6 +48,8 @@ export function ImageStudio() {
         try { localStorage.setItem(LAST_KEY, JSON.stringify(last)); } catch { /* storage full */ }
     };
     const editModelFor = (t2iId) => getI2IModelById(`${t2iId}-edit`) || getI2IModelById(t2iId.replace('-text-to-image', '-image-to-image'));
+    // How many reference images the first pick may hold: the limit of the edit model it will switch to.
+    const refMaxFor = (t2iId) => getMaxImagesForI2IModel(((!useLocalModel && editModelFor(t2iId)) || i2iModels[0]).id) || 1;
     const ratioValue = (r) => { const [w, h] = String(r).split(':').map(Number); return w > 0 && h > 0 ? w / h : NaN; };
     // Last used ratio if this model has it, else the closest one it has (4:5 -> 3:4), else the first.
     const pickAr = (list) => {
@@ -147,6 +149,7 @@ export function ImageStudio() {
     // --- Image Upload Picker (Image-to-Image) ---
     const picker = createUploadPicker({
         anchorContainer: container,
+        maxImages: refMaxFor(selectedModel),
         uploadFn: (file) => useLocalModel ? URL.createObjectURL(file) : muapi.uploadFile(file),
         requireApiKey: () => !useLocalModel,
         onSelect: ({ url, urls }) => {
@@ -180,7 +183,7 @@ export function ImageStudio() {
             const t2iResolutions = getResolutionsForModel(selectedModel);
             qualityBtn.style.display = t2iResolutions.length > 0 ? 'flex' : 'none';
             if (t2iResolutions.length > 0) document.getElementById('quality-btn-label').textContent = pickQuality(t2iResolutions);
-            picker.setMaxImages(1);
+            picker.setMaxImages(refMaxFor(selectedModel));
             textarea.placeholder = t('image.placeholder');
         }
     });
@@ -919,10 +922,8 @@ export function ImageStudio() {
                             document.getElementById('quality-btn-label').textContent = pickQuality(validResolutions);
                         }
 
-                        // Update picker's max images when switching i2i models
-                        if (imageMode) {
-                            picker.setMaxImages(getMaxImagesForI2IModel(selectedModel));
-                        }
+                        // Update picker's max images when switching models
+                        picker.setMaxImages(imageMode ? getMaxImagesForI2IModel(selectedModel) : refMaxFor(selectedModel));
 
                         closeDropdown();
                     };
@@ -1203,11 +1204,11 @@ export function ImageStudio() {
         textarea.value = '';
         picker.reset();
         uploadedImageUrls = [];
-        picker.setMaxImages(1);
         // Reset to t2i mode
         imageMode = false;
         selectedModel = lastT2iModel().id;
         selectedModelName = lastT2iModel().name;
+        picker.setMaxImages(refMaxFor(selectedModel));
         selectedAr = pickAr(getCurrentAspectRatios(selectedModel));
         document.getElementById('model-btn-label').textContent = selectedModelName;
         document.getElementById('ar-btn-label').textContent = selectedAr;
